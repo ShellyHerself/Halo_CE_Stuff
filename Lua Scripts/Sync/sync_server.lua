@@ -3,8 +3,8 @@ api_version = "1.9.0.0"
 
 
 --- Settings:
-ticks_per_update = 8 --determines the update rate
-
+ticks_per_update = 15 --determines the baseline update rate
+ticks_per_small_update = 4
 
 
 ---
@@ -305,6 +305,29 @@ function SendBipedInfo()
 				string_to_send = string_to_send .. string.format("%04X", CompressVelocity(synced_bipeds_vel_z[sb]))
 				
 				
+				for player=1,16 do
+					rprint(player, string_to_send)
+				end
+				
+			elseif (math.mod(tick_count,ticks_per_small_update) == 0) then
+				local string_to_send = "bo"
+				
+				string_to_send = string_to_send .. string.format("%04X", synced_bipeds_unique_id[sb])
+				
+				string_to_send = string_to_send .. string.format("%02X", CompressVector(synced_bipeds_rot_x[sb]))
+				string_to_send = string_to_send .. string.format("%02X", CompressVector(synced_bipeds_rot_y[sb]))
+				string_to_send = string_to_send .. string.format("%02X", CompressVector(synced_bipeds_rot_z[sb]))
+				
+				string_to_send = string_to_send .. string.format("%02X", CompressVector(synced_bipeds_look_x[sb]))
+				string_to_send = string_to_send .. string.format("%02X", CompressVector(synced_bipeds_look_y[sb]))
+				string_to_send = string_to_send .. string.format("%02X", CompressVector(synced_bipeds_look_z[sb]))
+				
+				if synced_bipeds_shooting[sb] ~= 0 then
+					string_to_send = string_to_send .. "1"
+				else
+					string_to_send = string_to_send .. "0"
+				end
+
 				for player=1,16 do
 					rprint(player, string_to_send)
 				end

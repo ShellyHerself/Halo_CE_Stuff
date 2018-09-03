@@ -55,6 +55,10 @@ function OnRconMessage(message)
 	elseif string.find(message, "bs", 1) ~= nil then
 		HandleClientActionUpdate(message)
 		return false
+		
+	elseif string.find(message, "bo", 1) ~= nil then
+		HandleClientOrientationUpdate(message)
+		return false
 	
 	elseif message == "mich_sync_update" then
 		execute_script("ai false")
@@ -240,6 +244,57 @@ function HandleClientActionUpdate(message)
 		write_u16(object_to_edit+0x52A, unique_id)
 end
 
+
+function HandleClientOrientationUpdate(message)
+		local unique_id = tonumber(string.sub(message, 3, 6), 16)
+
+
+		local rx = DecodeVector(tonumber(string.sub(message, 7, 8), 16))
+		local ry = DecodeVector(tonumber(string.sub(message, 9, 10), 16))
+		local rz = DecodeVector(tonumber(string.sub(message, 11, 12), 16))
+		
+		local lx = DecodeVector(tonumber(string.sub(message, 13, 14), 16))
+		local ly = DecodeVector(tonumber(string.sub(message, 15, 16), 16))
+		local lz = DecodeVector(tonumber(string.sub(message, 17, 18), 16))
+		
+		local shooting = tonumber(string.sub(message, 19, 19), 16)
+		
+		local object = nil
+		local object_to_edit = nil
+		
+		local object_count = read_word(object_array + 0x2E)
+		for i=0, object_count-1 do
+			object = get_object(i)
+			if object ~= nil then
+				local continue = true
+				for player=0,16 do
+					if object == get_dynamic_player(player) then
+						continue = false
+					end
+				end
+				
+				if continue == true then
+					if unique_id == read_u16(object+0x52A) then
+						object_to_edit = object
+						console_out("found:orientation update")
+					end
+				end
+			end
+		end
+		
+		if object_to_edit == nil then
+			return nil
+		end
+		
+		
+		write_vec3d(object_to_edit+0x74, rx, ry, rz)
+		write_vec3d(object_to_edit+0x230, lx, ly, lz)
+
+		
+		write_float(object_to_edit+0x284, shooting)
+		
+		write_u16(object_to_edit+0x52A, unique_id)
+end
 
 function DecodePosition(input)
 	return input/(2^24)*10000 -5000
