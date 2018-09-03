@@ -4,7 +4,7 @@ api_version = "1.9.0.0"
 
 --- Settings:
 ticks_per_update = 15 --determines the baseline update rate
-ticks_per_small_update = 4
+ticks_per_small_update = 3
 
 
 ---
