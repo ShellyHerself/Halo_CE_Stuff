@@ -17,31 +17,35 @@ queue_rate = short_announcement_time
 
 function OnRconMessage(message)
 	local messages = SplitLine(message)
-	
+
 	if messages[2] == "timer" then
-		if messages[3] ~= nil then
-			if messages[3] == "beepbeep" then
-				execute_script("sound_impulse_start sound\\timer\\beeps\\timerbeep none 1")
-			else
-				execute_script("sound_impulse_start \"sound\\timer\\cortana\\" .. messages[3] .. "\" none 1")
+		if messages[3] == "beepbeep" then
+			execute_script("sound_impulse_start sound\\timer\\beeps\\timerbeep none 1")
+		elseif messages[3] ~= nil then
+			execute_script("sound_impulse_start \"sound\\timer\\cortana\\" .. messages[3] .. "\" none 1")
+		end
+		
+		if messages[4] ~= nil then
+			for i=1,3 do
+				table.remove(messages, 1)
 			end
-			
-			if messages[4] ~= nil then
-				for i=1,3 do
+			queue = messages
+			queue_timer = 0
+		end
+		return false
+		
+	elseif messages[2] == "timr_lng_snds" then
+		if messages[3] ~= nil and messages[4] ~= nil then
+			short_announcement_time = messages[3]
+			long_announcement_time = messages[4]
+			if messages[5] ~= nil then
+				for i=1,4 do
 					table.remove(messages, 1)
 				end
-				queue = messages
-				queue_timer = 0
+				long_announcements = messages
 			end
-			return false
 		end
-	elseif messages[2] == "timr_lng_snds" then
-		short_announcement_time = messages[3]
-		long_announcement_time = messages[4]
-		for i=1,4 do
-			table.remove(messages, 1)
-		end
-		long_announcements = messages
+		return false
 	end
 end
 
