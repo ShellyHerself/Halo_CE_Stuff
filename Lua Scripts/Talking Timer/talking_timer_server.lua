@@ -77,12 +77,9 @@ function OnTick()
 					message_to_send = message_to_send .. ":30_seconds"
 				elseif seconds_left == 20 then
 					message_to_send = message_to_send .. ":20(twenny)_seconds"
-				elseif seconds_left == 10 then
-					message_to_send = message_to_send .. ":" .. seconds_left
 				elseif seconds_left <= 10 then
 					message_to_send = message_to_send .. ":" .. seconds_left
 				end
-			
 			end
 			
 			-- if the message is just |n there is no data in it, so only send when we have data
