@@ -1,4 +1,5 @@
 (script dormant cutscene_title_references
+(cinematic_set_title "00")
 (cinematic_set_title "01")
 (cinematic_set_title "02")
 (cinematic_set_title "03")
@@ -30,5 +31,4 @@
 (cinematic_set_title "29")
 (cinematic_set_title "30")
 (cinematic_set_title "31")
-(cinematic_set_title "32")
 )
