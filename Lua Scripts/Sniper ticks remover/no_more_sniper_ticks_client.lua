@@ -1,5 +1,6 @@
 ---------------------------------------------
--- Sniper tick removal                     --
+-- Sniper tick remover                     --
+-- Removes the sniper ticks in most maps   --
 -- Lua script written by Michelle          --
 -- Feed her by donating to paypal address: --
 -- gbmichelle.halo@gmail.com               --
