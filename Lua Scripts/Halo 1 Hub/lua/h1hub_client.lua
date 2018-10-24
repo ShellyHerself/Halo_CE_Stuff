@@ -55,6 +55,14 @@ function OnRconMessage(message)
 		end
 		return false
 		
+	elseif messages[2] == "cin_tit" then
+		if messages[3] == "del" then
+			CutsceneTitleRemove(tonumber(messages[4], 16))
+		else
+			CutsceneTitleMessage(messages[1], messages[3])
+		end
+		return false
+		
 	elseif messages[2] == "version" then
 		if tonumber(messages[3]) <= script_version then
 			cprint("Debug: Client and server scripts are compatible.", 0, 1, 0)
@@ -67,16 +75,6 @@ function OnRconMessage(message)
 		
 	elseif CompareEndOfString(message, "|ndelete") == true then
 		-- return false to delete
-		return false
-		
-	elseif CompareEndOfString(message, "|ncutscene_title") == true then
-	-- remove all special and positional data before sending it over to the hud
-		message = string.gsub(message, "|ncutscene_title", "")
-		message = string.gsub(message, "|r", "")
-		message = string.gsub(message, "|c", "")
-		message = string.gsub(message, "|l", "")
-		
-		CutsceneTitleMessage(message)
 		return false
 		
 	elseif CompareEndOfString(message, "|nhud_text") == true then
@@ -119,24 +117,91 @@ end
 
 
 --- Cutscene title stuff
-cutscene_title_string_addr = nil
 cutscene_title_block_addr = nil
-
+cutscene_title_string_block_addr = nil
 
 function InitCutsceneTitleMessages()
 	local scenario_cutscene_titles_block_reflexive_offset = 1276
 	local scenario_ingame_help_text_reference_offset = 1412
 	cutscene_title_block_addr = read_u32(read_u32(0x40440028+0x14)+scenario_cutscene_titles_block_reflexive_offset+4)
 	local ustr_tag_id = read_u16(read_u32(0x40440028+0x14)+scenario_ingame_help_text_reference_offset+12)
-	local ustr_tag_addr = read_u32(get_tag(ustr_tag_id)+0x14)
-	cutscene_title_string_addr = read_u32(read_u32(ustr_tag_addr+4)+12)
-	
+	local cutscene_title_ustr_tag_addr = read_u32(get_tag(ustr_tag_id)+0x14)
+	cutscene_title_string_block_addr = read_u32(cutscene_title_ustr_tag_addr+4)
 end
 
-function CutsceneTitleMessage(message)
-	write_nulterminated_widestring(cutscene_title_string_addr, message, string.len(message))
-	execute_script("cinematic_set_title \"right\"")
+virtual_hud_bounds_x1 = 0
+virtual_hud_bounds_y1 = 0
+virtual_hud_bounds_x2 = 640
+virtual_hud_bounds_y2 = 480
+
+--Amount of characters each var stored in the message take up
+cutscene_msg_struct = { 2,         --slot
+                        3, 3,      --cutscene_title_x/y
+                        3, 3, 3,   --fade_in_time, staying_time, fade_out_time
+                        2, 2, 2, 2}--argb
+
+function CutsceneTitleMessage(text, settings)
+	local slot, x, y, fade_in, stay_for, fade_out, a,r,g,b = DecodeMessageUsingStruct(settings, cutscene_msg_struct)
+	
+	local justification = 0 -- 0 is left, 1 is right, 2 is center
+	if string.sub(text, 1, 2) == "|r" then
+		justification = 1
+	elseif string.sub(text, 1, 2) == "|c" then
+		justification = 2
+	end
+	
+	if x > 2047 then
+		x = virtual_hud_bounds_x2 + x - 0xFFF
+	else
+		x = virtual_hud_bounds_x1 + x
+	end
+	if y > 2047 then
+		y = virtual_hud_bounds_y2 + y - 0xFFF
+	else
+		y = virtual_hud_bounds_y1 + y
+	end
+	
+	write_i16(cutscene_title_block_addr+96*slot+40, y)
+	write_i16(cutscene_title_block_addr+96*slot+42, virtual_hud_bounds_y2)
+	write_i16(cutscene_title_block_addr+96*slot+44, virtual_hud_bounds_x2)
+	write_i16(cutscene_title_block_addr+96*slot+46, x)
+	
+	write_i16(cutscene_title_block_addr+96*slot+52, justification)
+	
+	write_argb(cutscene_title_block_addr+96*slot+60, a, r, g, b)
+	
+	write_f32(cutscene_title_block_addr+96*slot+68, fade_in)
+	write_f32(cutscene_title_block_addr+96*slot+72, stay_for)
+	write_f32(cutscene_title_block_addr+96*slot+76, fade_out)
+	
+	text = string.gsub(text, "|r", "")
+	text = string.gsub(text, "|c", "")
+	text = string.gsub(text, "|l", "")
+	text = string.gsub(text, "|n", "")
+	
+	write_nulterminated_widestring(read_u32(cutscene_title_string_block_addr+20*slot+12), text, string.len(text))
+	execute_script("cinematic_set_title \"".. string.format("%02d", slot) .."\"")
 end
+
+function CutsceneTitleRemove(slot)
+	write_argb(cutscene_title_block_addr+96*slot+60, 0, 0, 0, 0)
+	write_f32(cutscene_title_block_addr+96*slot+68, 0)
+	write_f32(cutscene_title_block_addr+96*slot+72, 0)
+	write_f32(cutscene_title_block_addr+96*slot+76, 0)
+end
+-- Decodes a string into a set of number variables the given list of what size each var takes up in the string.
+function DecodeMessageUsingStruct(message, size_list)
+	local sum_of_prev = 0
+	local output = {}
+	for k, v in pairs(size_list) do
+		number = tonumber(string.sub(message, sum_of_prev+1, sum_of_prev+size_list[k]), 16)
+		table.insert(output, number)
+		sum_of_prev = sum_of_prev + size_list[k]
+	end
+	
+	return table.unpack(output)
+end
+
 
 function read_argb(address)
 	local a = read_u8(address+3)
@@ -147,7 +212,7 @@ function read_argb(address)
 	return a,r,g,b
 end
 
-function write_argb(dest, a, r, g, b)
+function write_argb(address, a, r, g, b)
 	write_u8(address+3, a)
 	write_u8(address+2, r)
 	write_u8(address+1, g)
@@ -156,7 +221,7 @@ end
 
 function write_nulterminated_widestring(address, str, len)
 	write_widestring(address, str, len)
-	write_u16(cutscene_title_string_addr+2*len, 0)
+	write_u16(address+2*len, 0)
 end
 
 function write_widestring(address, str, len)
@@ -165,6 +230,8 @@ function write_widestring(address, str, len)
     for i = 1,length do -- Sets the new string.
         local newbyte = string.byte(string.sub(str,i,i))
         write_byte(address + count, newbyte)
+		--write_byte(address + count + 1, 0)
+		
         count = count + 2
     end
 end
@@ -190,9 +257,11 @@ function CompareEndOfString(str, cmp)
 	return false
 end
 
+sep = "`" --seperator
+
 function SplitLine(inputstr)
 	local t={} ; i=1
-	for str in string.gmatch(inputstr, "([^:]+)") do
+	for str in string.gmatch(inputstr, "([^".. sep .. "]+)") do
 		t[i] = str
 		i = i + 1
 	end

@@ -5,9 +5,9 @@ api_version = "1.9.0.0"
 -- Admin setup:
 enable_timer_functions = true
 	enable_talking_timer = true -- weapon countdowns are not implemented yet.
-		enable_weapon_announcements = false -- Not implemented yet.
+		enable_weapon_announcements = true -- Not implemented yet.
 	
-	enable_cutscene_title_timer = false -- Not properly implemented yet.
+	enable_cutscene_title_timer = true -- Not properly implemented yet.
 
 -- Announcements that require a second instead of just half a second
 long_announcements = { "overshield", "camo", "rocket", "sniper", "up_next", "20(twenny)_seconds"}
@@ -38,7 +38,7 @@ function OnScriptLoad()
 end
 
 function OnJoin(player_id)
-	rprint(player_id, "|n:version:" .. script_version)
+	rprint(player_id, "|n" ..sep.. "version" ..sep .. script_version)
 end
 
 function OnGameStart()
@@ -116,42 +116,43 @@ function TimersOnTick()
 	end
 end
 
+sep = "`" --seperator
 
 function TalkingTimerAnnounce(time_passed, minutes, seconds)
 	local seconds_left = 60 - seconds
 
-	local message_to_send = "|n:timer"
+	local message_to_send = "|n"..sep.."timer"
 	
 	-- 10 seconds into the minute there is no beep,
 	-- during the last 10 seconds there is no beep because of the count down
 	if seconds_left % 10 == 0 and seconds ~= 10 and seconds_left ~= 10 then
-		message_to_send = message_to_send .. ":beepbeep"
+		message_to_send = message_to_send ..sep.."beepbeep"
 	end
 	-- minute announcements only happen when the minute has just started
 	if seconds == 0 then
 		if minutes ~= 0 then
-			message_to_send = message_to_send .. ":" .. minutes .. "_minute"
+			message_to_send = message_to_send .. sep .. minutes .. "_minute"
 			if minutes ~= 1 then
 				message_to_send = message_to_send .. "s"
 			end
 		--30 minutes will show up as 0 due to the modulus,
 		--and we need to avoid saying 30 minutes at the start of the game
 		elseif ticks_passed > 0 then
-			message_to_send = message_to_send .. ":30_minutes"
+			message_to_send = message_to_send .. sep .. "30_minutes"
 		end
 	-- this else is because this should not be ran on the top of a minute
 	else
 	if seconds_left == 30 then
-			message_to_send = message_to_send .. ":30_seconds_left"
+			message_to_send = message_to_send .. sep .. "30_seconds_left"
 		elseif seconds_left == 20 then
-			message_to_send = message_to_send .. ":20(twenny)_seconds"
+			message_to_send = message_to_send .. sep .. "20(twenny)_seconds"
 		elseif seconds_left <= 10 then
-			message_to_send = message_to_send .. ":" .. seconds_left
+			message_to_send = message_to_send .. sep .. seconds_left
 		end
 	end
 			
 	-- if the message is just "|n:timer" there is no data in it, so only send when we have data
-	if message_to_send ~= "|n:timer" then
+	if message_to_send ~= "|n"..sep.."timer" then
 		for i=1,16 do
 			rprint(i, message_to_send)
 		end
@@ -162,18 +163,68 @@ end
 function OnScreenTimerUpdate(minutes, seconds)
 	for i=1,16 do
 		ClearPlayerConsole(i)
-		rprint(i, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds) .. "|ncutscene_title")
+		--rprint(i, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds) .. "|ncin_tit")
+		CutsceneTitlePrint(i, seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0, 1, 1, 120, 117, 186, 255)
+		CutsceneTitleDelete(i, (seconds+1) % 2)
 	end
 end
 
-sep = "█" --seperator
 
-function CutsceneTitlePrint(slot, text, console_alignment, cutscene_title_x, cutscene_title_y, fade_in_time, staying_time, fade_out_time, red, green, blue)
+
+function CutsceneTitlePrint(player_id, slot, text, 
+                            cutscene_title_x, cutscene_title_y,
+                            fade_in_time, staying_time, fade_out_time, 
+                            alpha, red, green, blue)
 	
+	if string.len(text) > 40 then
+		text = string.sub(text, 1, 40)
+	end
+	
+	slot = CheckValueBounds(math.floor(slot), 0, 31)
+	
+	cutscene_title_x = CheckValueBounds(math.floor(cutscene_title_x), -2047, 2047)
+	if cutscene_title_x < 0 then
+		cutscene_title_x = cutscene_title_x + 0xFFF
+	end
+	cutscene_title_y = CheckValueBounds(math.floor(cutscene_title_y), -2047, 2047)
+	if cutscene_title_y < 0 then
+		cutscene_title_y = cutscene_title_y + 0xFFF
+	end
+	
+	fade_in_time = CheckValueBounds(math.floor(fade_in_time*30), 0, 0xFFF)
+	staying_time = CheckValueBounds(math.floor(staying_time*30), 0, 0xFFF)
+	fade_out_time = CheckValueBounds(math.floor(fade_out_time*30), 0, 0xFFF)
+	
+	red = CheckValueBounds(math.floor(red), 0, 0xFF)
+	green = CheckValueBounds(math.floor(green), 0, 0xFF)
+	blue = CheckValueBounds(math.floor(blue), 0, 0xFF)
+	
+	local text = text .. "|n"..sep.."cin_tit"
+	text = text ..sep.. string.format("%02X", slot) 
+	text = text .. string.format("%03X", cutscene_title_x)
+	text = text .. string.format("%03X", cutscene_title_y)
+	text = text .. string.format("%03X", fade_in_time) .. string.format("%03X", staying_time) .. string.format("%03X", fade_out_time)
+	text = text .. string.format("%02X", alpha) .. string.format("%02X", red) .. string.format("%02X", green) .. string.format("%02X", blue)
+	
+	rprint(player_id, text)
 end
 
-function CutsceneTitleDelete(slot)
-	
+function CutsceneTitleDelete(player_id, slot)
+	rprint(player_id, "|n" ..sep.. "cin_tit" ..sep.. "del" ..sep.. string.format("%02X", slot))
+end
+
+function CheckValueBounds(value, low_bound, high_bound)
+	if value ~= nil then
+		if value > high_bound then
+			return high_bound
+		elseif value < low_bound then
+			return low_bound
+		else
+			return value
+		end
+	else
+		return low_bound
+	end
 end
 
 function ClearPlayerConsole(id)
