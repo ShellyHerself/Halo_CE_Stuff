@@ -66,6 +66,8 @@ elseif sandboxed ~= nil then
 		write_f32(address+8, k)
 	end
 	
+	cprint = console_out
+	
 end
 
 -- used for parsing and conversion
@@ -74,7 +76,7 @@ types = {
 	u16   = { r = read_u16  , w = write_u16  , round = true  },
 	u32   = { r = read_u32  , w = write_u32  , round = true  },
 	f32   = { r = read_f32  , w = write_f32  , round = false },
-	vec3d = { r = read_vec32, w = write_vec32, round = false }
+	vec3d = { r = read_vec32, w = write_vec32, round = false, value_count = 3 }
 }
 -- shared functions
 
