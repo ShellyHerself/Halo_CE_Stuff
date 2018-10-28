@@ -68,6 +68,14 @@ elseif sandboxed ~= nil then
 	
 end
 
+-- used for parsing and conversion
+types = {
+	u8    = { r = read_u8   , w = write_u8   , round = true  },
+	u16   = { r = read_u16  , w = write_u16  , round = true  },
+	u32   = { r = read_u32  , w = write_u32  , round = true  },
+	f32   = { r = read_f32  , w = write_f32  , round = false },
+	vec3d = { r = read_vec32, w = write_vec32, round = false }
+}
 -- shared functions
 
 function GetSumOfSizeList(list)
@@ -108,6 +116,14 @@ function DecodeBase255(input)
 	return n
 end
 
+function RoundToInt(number)
+	if number % 1 < 0.5 then
+		return math.floor(number)
+	else
+		return math.ceil(number)
+	end
+end
+
 -- structures
 
 bipd_baseline_sizes = {
@@ -122,7 +138,7 @@ bipd_baseline_sizes = {
 	1,       -- unit state
 	1        -- shooting
 } -- 33
-bip_baseline_msg_size = GetSumOfSizeList(bip_baseline_sizes)
+bipd_baseline_msg_size = GetSumOfSizeList(bipd_baseline_sizes)
 
 
 bipd_action_sizes = {
@@ -133,7 +149,7 @@ bipd_action_sizes = {
 	1, 1, 1, -- look i,j,k
 	1        -- shooting
 } -- 21
-bip_action_msg_size = GetSumOfSizeList(bip_action_sizes)
+bipd_action_msg_size = GetSumOfSizeList(bipd_action_sizes)
 
 
 bipd_rot_sizes = {
@@ -143,7 +159,7 @@ bipd_rot_sizes = {
 	1, 1, 1, -- look i,j,k
 	1        -- shooting
 } -- 9
-bip_rot_msg_size = GetSumOfSizeList(bip_rot_sizes)
+bipd_rot_msg_size = GetSumOfSizeList(bipd_rot_sizes)
 
 
 bipd_spawn_sizes = {
@@ -152,7 +168,7 @@ bipd_spawn_sizes = {
 	1, 1, 1, -- real color
 	3        -- weapon tag id
 } -- 8
-bip_spawn_msg_size = GetSumOfSizeList(bip_spawn_sizes)
+bipd_spawn_msg_size = GetSumOfSizeList(bipd_spawn_sizes)
 
 
 proj_spawn_sizes = {
@@ -164,9 +180,9 @@ proj_spawn_msg_size = GetSumOfSizeList(proj_spawn_sizes)
 
 
 
-print("bip_baseline_msg_size " .. bip_baseline_msg_size)
-print("bip_action_msg_size " .. bip_action_msg_size)
-print("bip_rot_msg_size " .. bip_rot_msg_size)
-print("bip_spawn_msg_size " .. bip_spawn_msg_size)
+print("bip_baseline_msg_size " .. bipd_baseline_msg_size)
+print("bip_action_msg_size " .. bipd_action_msg_size)
+print("bip_rot_msg_size " .. bipd_rot_msg_size)
+print("bip_spawn_msg_size " .. bipd_spawn_msg_size)
 
 
