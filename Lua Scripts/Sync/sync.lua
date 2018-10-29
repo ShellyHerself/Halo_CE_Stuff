@@ -89,12 +89,14 @@ types = {
 
 function GetMessageSize(message_struct)
 	local sum = 0
-	for k,v in pairs(message_struct) do
-		sum = sum + message_struct[k].size
-	end
+	entry = 1
+	-- we do a while loop here because the k,v in pairs() method iterates over named table entries, and we don't want that.
+	repeat
+		sum = sum + message_struct[entry].size
+		entry = entry + 1
+	until message_struct[entry] == nil
 	return sum
 end
-
 
 function EncodeBase255(input)
     n = math.floor(input)
