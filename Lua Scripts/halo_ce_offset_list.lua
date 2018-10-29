@@ -53,19 +53,19 @@ function OnScriptLoad(process, Game, persistent)
 	local gametype_oddball_trait_without_ball = read_byte(gametype_base + 0x88) -- Confirmed. (None = 0) (Invisible = 1) (Extra Damage = 2) (Damage Resistant = 3)
 	local gametype_oddball_ball_type = read_byte(gametype_base + 0x8C) -- Confirmed. (Normal = 0) (Reverse Tag = 1) (Juggernaut = 2)
 	local gametype_oddball_ball_spawn_count = read_byte(gametype_base + 0x90) -- Confirmed.
-	
+
 	--mapcycle header
 	mapcycle_pointer = read_dword(mapcycle_header) -- (???) index * 0xA4 + 0xC + this = something.
 	mapcycle_total_indicies = read_dword(mapcycle_header + 0x4) -- From DZS. Number of options in the mapcycle.
 	mapcycle_total_indicies_allocated = read_dword(mapcycle_header + 0x8) -- From Phasor.
 	mapcycle_current_index = read_dword(mapcycle_header + 0xC) -- Confirmed. Current mapcycle index.
-	
+
 	--mapcycle struct
 	mapcycle_something = readwidestring(mapcycle_pointer + mapcycle_current_index * 0xE4 + 0xC) -- (???) LOTS OF BAADF00D!
 	mapcycle_current_map_name = read_string(read_dword(mapcycle_pointer)) -- Confirmed. Real name of the map.
 	mapcycle_current_gametype_name = read_string(read_dword(mapcycle_pointer + 0x4)) -- Confirmed. Real name of the gametype. Case-sensitive.
 	mapcycle_current_gametype_name2 = readwidestring(mapcycle_pointer + 0xC) -- Confirmed. Real name of gametype. Case-sensitive.
-	
+
 	--Server globals
 	server_initialized = read_bit(network_server_globals, 0) -- Tested.
 	server_last_display_time = read_dword(network_server_globals + 0x4) -- From OS.
@@ -85,7 +85,7 @@ function OnScriptLoad(process, Game, persistent)
 	--unkFloat[2] 0x8 (???)
 	--unkLong[9] 0x10 (???)
 	--unkFloat[2] 0x34 (???)
-	
+
 	--gameinfo struct (someone should really help me with names lol)
 	gameinfo_initialized = read_bit(gameinfo_base, 0) -- Confirmed. If the game is started or in standby. (1 if started, 0 if not)
 	gameinfo_active = read_bit(gameinfo_base, 1) -- Confirmed. If the game is currently running (Active = True, Not Active = False)
@@ -98,11 +98,11 @@ function OnScriptLoad(process, Game, persistent)
 	gameinfo_server_speed = read_dword(gameinfo_base + 0x18) -- Confirmed. Changing this would be the same as cheatengining the server and messing with speedhack control.
 	gameinfo_leftover_time = read_dword(gameinfo_base + 0x1C) -- From OS. Not sure what this is. Changes frequently.
 	--unkLong[39] 0x20 don't care enough to continue.
-	
+
 	--banlist header
 	banlist_size = read_dword(banlist_header)
 	banlist_base = read_dword(banlist_header + 0x4)
-	
+
 	--banlist struct
 	banlist_struct_size = 0x44
 	for j = 1,banlist_size do
@@ -113,7 +113,7 @@ function OnScriptLoad(process, Game, persistent)
 		ban_indefinitely = read_bit(banlist_base + j * 0x44 + 0x3E, 0) -- Confirmed. 1 if permanently banned, 0 if not.
 		ban_time = read_dword(banlist_base + j * 0x44 + 0x40) -- Confirmed. Ban end date.
 	end
-	
+
 	--String/data addresses that aren't in a struct/header (to my knowledge).
 	server_broadcast_version = read_string(broadcast_version_address) -- Confirmed. Version that the server is broadcasting on.
 	version_info = read_string(version_info_address, 0x2A) -- Confirmed. Some version info for halo
@@ -128,7 +128,7 @@ function OnScriptLoad(process, Game, persistent)
 	server_password = read_string(server_password_address, 8) -- Confirmed. Current server password for the server (will be nullstring if there is no password)
 	banlist_path = read_string(banlist_path_address) -- Confirmed. Path to the banlist file.
 	rcon_password = read_string(rcon_password_address, 8) -- Confirmed. Current rcon password for the server.
-	
+
 	-- random unuseful crap (string stuff) don't care enough to do CE
 	-- don't know why I even cared enough to write these down.
 	if game == "PC" then
@@ -174,7 +174,7 @@ function GetGameAddresses(game)
 		network_server_globals = 0x69B934
 		flags_pointer = 0x6A590C
 		hash_table_base = 0x6A2AE4
-		
+
 		-- String/Data Addresses.
 		broadcast_version_address = 0x5DF840
 		version_info_address = 0x5E02C0
@@ -220,7 +220,7 @@ function GetGameAddresses(game)
 		mapcycle_header = 0x598A8C
 		network_server_globals = 0x61FB64
 		hash_table_base = 0x5AFB34
-		
+
 		-- String/Data Addresses.
 		broadcast_version_address = 0x564B34
 		version_info_address = 0x565104
@@ -235,7 +235,7 @@ function GetGameAddresses(game)
 		server_password_address = 0x61FB6C
 		banlist_path_address = 0x61FB80
 		rcon_password_address = 0x61FC8C
-		
+
 
 		--Patches
 		hashcheck_patch = 0x530130
@@ -253,7 +253,7 @@ function OnClientUpdate(player, m_objectId)
 
 		-- Confirmed/tested addresses and offsets
 		-- teams: red = 0, blue = 1
-		
+
 		--stats header (size = 0x178 = 376 bytes)
 		--This header is seriously unfinished.
 		stats_header_recorded_animations_data = read_dword(stats_header + 0x0) -- Confirmed. Pointer to Recorded Animations data table.
@@ -293,7 +293,7 @@ function OnClientUpdate(player, m_objectId)
 		--unkLong[1] 0xEC-0xF0 (???)
 		--unkByte[130] 0xF0-0x172 (Zero's)
 		--unkPointer[2] 0x172-0x17A
-		
+
 		--stats struct (size = 0x30 = 48 bytes)
 		stats_base = stats_globals + player*0x30
 		stats_player_ingame = read_byte(stats_base + 0x0) -- From Silentk (1 = Ingame, 0 if not)
@@ -428,7 +428,7 @@ function OnClientUpdate(player, m_objectId)
 		--	bitPadding[15] 1-15
 		--player_auto_aim_target_objId = readident(m_player + 0x40)	-- (???) Always 0xFFFFFFFF
 		player_last_bullet_time = read_dword(m_player + 0x44) -- Confirmed. gameinfo_current_time - this = time since last shot fired. (1 second = 30 ticks). Auto_aim_update_time in OS.
-		
+
 		--This stuff comes directly from the client struct:
 		player_name2 = readwidestring(m_player + 0x48, 12) -- Confirmed.
 		player_color = read_word(m_player + 0x60) -- Confirmed. Color of the player (FFA Gametypes Only.) (0 = white) (1 = black) (2 = red) (3 = blue) (4 = gray) (5 = yellow) (6 = green) (7 = pink) (8 = purple) (9 = cyan) (10 = cobalt) (11 = orange) (12 = teal) (13 = sage) (14 = brown) (15 = tan) (16 = maroon) (17 = salmon)
@@ -438,7 +438,7 @@ function OnClientUpdate(player, m_objectId)
 		player_team2 = read_byte(m_player + 0x66) -- Confirmed. (Red = 0) (Blue = 1)
 		player_index = read_byte(m_player + 0x67) -- Confirmed. Player memory id/index (0 - 15) (To clarify: this IS the 'player' argument passed to phasor functions)
 		--End of client struct stuff.
-		
+
 		player_invis_time = read_word(m_player + 0x68) -- Confirmed. Time until player is no longer camouflaged. (1 sec = 30 ticks)
 		--unkWord[1] 0x6A-0x6C (???) Has something to do with player_invis_time.
 		player_speed = read_float(m_player + 0x6C) -- Confirmed.
@@ -466,7 +466,7 @@ function OnClientUpdate(player, m_objectId)
 		--Padding[14] 0xB2-0xC0
 		player_teamkills = read_word(m_player + 0xC0) -- From OS.
 		--Padding[2] 0xC2-0xC4
-		
+
 		--This is all copied from the stat struct
 		player_flag_steals = read_word(m_player + 0xC4) -- Confirmed. Flag steals for CTF.
 			player_hill_time = read_word(m_player + 0xC4) -- Confirmed. Time for KOTH. (1 sec = 30 ticks)
@@ -477,7 +477,7 @@ function OnClientUpdate(player, m_objectId)
 		player_flag_scores = read_word(m_player + 0xC8) -- Confirmed. Flag scores for CTF.
 			player_oddball_kills = read_word(m_player + 0xC8) -- Confirmed. Number of kills you have as Juggernaut or It.
 			player_race_best_time = read_word(m_player + 0xC8) -- Confirmed. Best time for Race. (1 sec = 30 ticks)
-		
+
 		--unkByte[2] 0xCA-0xCC (Padding Maybe?)
 		player_telefrag_timer = read_dword(m_player + 0xCC) -- Confirmed. Time spent blocking a tele. Counts down after other player stops trying to teleport. (1 sec = 30 ticks)
 		player_quit_time = read_dword(m_player + 0xD0) -- Confirmed. gameinfo_current_time - this = time since player quit. 0xFFFFFFFF if player not quitting. (1 sec = 30 ticks)
@@ -496,8 +496,8 @@ function OnClientUpdate(player, m_objectId)
 		player_y_coord = read_float(m_player + 0xFC) -- Confirmed.
 		player_z_coord = read_float(m_player + 0x100) -- Confirmed.
 		--unkIdent[1] 0x104-0x108 (???)
-		
-		
+
+
 		--unkByte[8] 0x108-0x110 (???)
 		--unkLong[1] 0x110-0x114 (Some timer)
 		--unkByte[8] 0x114-0x11C (???)
@@ -509,7 +509,7 @@ function OnClientUpdate(player, m_objectId)
 		--	unkBit[9] 4-12
 			player_reload_key = read_bit(m_player + 0x11C, 13) -- Confirmed.
 		--	unkBit[2] 14-15
-		
+
 		--unkByte[30] 0x11E-0x134 (???)
 		player_xy_aim = read_float(m_player + 0x138) -- Confirmed. Lags. (0 to 2pi) In radians.
 		player_z_aim = read_float(m_player + 0x13C) -- Confirmed. Lags. (-pi/2 to pi/2) In radians.
@@ -538,7 +538,7 @@ function OnClientUpdate(player, m_objectId)
 		end
 
 		--*****************************************	OBJECTS	**************************************************************
-		
+
 		-- obj struct. This struct applies to ALL OBJECTS. 0x0 - 0x1F4
 		obj_tag_id = read_dword(m_object) -- Confirmed with HMT. Tag Meta ID / MapID / TagID.
 		--obj_object_role = read_dword(m_object + 0x4) -- From OS. (0 = Master, 1 = Puppet, 2 = Puppet controlled by local player, 3 = ???) Always 0?
@@ -549,7 +549,7 @@ function OnClientUpdate(player, m_objectId)
 		obj_existance_time = read_dword(m_object + 0xC) -- Confirmed. (1 second = 30 ticks)
 		--	Physics bitmask32:
 			obj_noCollision = read_bit(m_object + 0x10, 0) -- Confirmed. (Ghost mode = True)
-			obj_is_on_ground = read_bit(m_object + 0x10, 1) -- Confirmed. (Object is on the ground = True, otherwise False) 
+			obj_is_on_ground = read_bit(m_object + 0x10, 1) -- Confirmed. (Object is on the ground = True, otherwise False)
 			obj_ignoreGravity = read_bit(m_object + 0x10, 2) -- From Phasor
 		--	obj_is_in_water = read_bit(m_object + 0x10, 3) -- (???) Always 0?
 		--	unkBits[1] 0x10 4
@@ -573,7 +573,7 @@ function OnClientUpdate(player, m_objectId)
 		--obj_owner_player_id = readident(m_object + 0x50) -- (???) Always 0?
 		--obj_owner_id = readident(m_object + 0x54) -- (???) Always 0?
 		--obj_timestamp = read_dword(m_object + 0x58) -- (???) Always 0?
-		
+
 		obj_x_coord = read_float(m_object + 0x5C) -- Confirmed.
 		obj_y_coord = read_float(m_object + 0x60) -- Confirmed.
 		obj_z_coord = read_float(m_object + 0x64) -- Confirmed.
@@ -583,13 +583,13 @@ function OnClientUpdate(player, m_objectId)
 		obj_pitch = read_float(m_object + 0x74) -- Confirmed. In Radians. (-1 to 1)
 		obj_yaw = read_float(m_object + 0x78) -- Confirmed. In Radians. (-1 to 1)
 		obj_roll = read_float(m_object + 0x7C) -- Confirmed. In Radians. (-1 to 1)
-		obj_x_scale = read_float(m_object + 0x80) -- Tested. 0 for bipd. Changes when in vehi. Known as 'up' in OS.
-		obj_y_scale = read_float(m_object + 0x84) -- Tested. 0 for bipd. Changes when in vehi. Known as 'up' in OS.
-		obj_z_scale = read_float(m_object + 0x88) -- Tested. 1 for bipd. Changes when in vehi. Known as 'up' in OS.
+		obj_x_up_multiplier = read_float(m_object + 0x80) --
+		obj_y_up_multiplier = read_float(m_object + 0x84) -- multiplier used for determining the velocity in each direction when a biped jumps
+		obj_z_up_multiplier = read_float(m_object + 0x88) --
 		obj_pitch_vel = read_float(m_object + 0x8C) -- Confirmed for vehicles. Current velocity for pitch.
 		obj_yaw_vel = read_float(m_object + 0x90) -- Confirmed for vehicles. Current velocity for yaw.
 		obj_roll_vel = read_float(m_object + 0x94) -- Confirmed for vehicles. Current velocity for roll.
-		
+
 		obj_locId = read_dword(m_object + 0x98) -- Confirmed. Each map has dozens of location IDs, used for general location checking.
 		--unkLong[1] 0x9C (Padding Maybe?)
 		-- Apparently these are coordinates, used for the game code's trigger volume point testing
@@ -609,7 +609,7 @@ function OnClientUpdate(player, m_objectId)
 		--Padding[4] 0xC8-0xCC
 		--REM: figure out what this animation stuffz is.
 		obj_antr_meta_id = readident(m_object + 0xCC) -- From DZS. Remind me to look at eschaton to see what this actually is (Possible Struct?)
-		obj_animation_state = read_word(m_object + 0xD0) -- Confirmed. The actual animation ID from animations tag which is currently playing. (by aLTis)
+		obj_animation_id = read_word(m_object + 0xD0) -- Confirmed. The actual animation ID from animations tag which is currently playing. (by aLTis)
 		obj_time_since_animation_state_change = read_word(m_object + 0xD2) -- Confirmed (0 to 60) Time since last animation_state change. Restarts at 0 when animation_state changes (1 sec = 30 ticks)
 		--unkWord[2] 0xD4-0xD8 (???)
 		obj_max_health = read_float(m_object + 0xD8) -- Confirmed. Takes value from coll tag.
@@ -647,7 +647,7 @@ function OnClientUpdate(player, m_objectId)
 		--	bitmask8:
 			obj_force_shield_update = read_bit(m_object + 0x122, 0) -- From OS.
 		--	unkBits[15] 1-15 (???)
-		
+
 		--Functions.
 		obj_shields_hit = read_float(m_object + 0x124) -- Tested. Counts down from 1 after shields are hit (0 to 1)
 		obj_shields_target = read_float(m_object + 0x128) -- Tested. When you have an overshield it stays at 1 which is why I think the overshield drains. (0 to 1) [2nd function]
@@ -658,7 +658,7 @@ function OnClientUpdate(player, m_objectId)
 		obj_shields_hit2 = read_float(m_object + 0x13C) -- Tested. Something to do with shields getting hit. [3rd function]
 		obj_export_function4 = read_float(m_object + 0x140) -- Tested. (1 = Assault Rifle)
 		--End of functions.
-		
+
 		--Regions/Attachments.
 		obj_attachment_type = read_byte(m_object + 0x144) -- From OS. (0 = light, 1 = looping sound, 2 = effect, 3 = contrail, 4 = particle, 5 = ???, 0xFF = invalid)
 		obj_attachment_type2 = read_byte(m_object + 0x145) -- From OS. (0 = light, 1 = looping sound, 2 = effect, 3 = contrail, 4 = particle, 5 = ???, 0xFF = invalid)
@@ -668,7 +668,7 @@ function OnClientUpdate(player, m_objectId)
 		obj_attachment_type6 = read_byte(m_object + 0x149) -- From OS. (0 = light, 1 = looping sound, 2 = effect, 3 = contrail, 4 = particle, 5 = ???, 0xFF = invalid)
 		obj_attachment_type7 = read_byte(m_object + 0x14A) -- From OS. (0 = light, 1 = looping sound, 2 = effect, 3 = contrail, 4 = particle, 5 = ???, 0xFF = invalid)
 		obj_attachment_type8 = read_byte(m_object + 0x14B) -- From OS. (0 = light, 1 = looping sound, 2 = effect, 3 = contrail, 4 = particle, 5 = ???, 0xFF = invalid)
-		
+
 		-- game state identity
 		-- ie, if Attachments[x]'s definition (object_attachment_block[x]) says it is a 'cont'
 		-- then the identity is a contrail_data handle
@@ -701,7 +701,7 @@ function OnClientUpdate(player, m_objectId)
 		obj_region_permutation7_index = readchar(m_object + 0x186) -- From OS.
 		obj_region_permutation8_index = readchar(m_object + 0x187) -- From OS.
 		--End of regions/attachments
-		
+
 		obj_color_change_red = read_float(m_object + 0x188) -- From OS.
 		obj_color_change_green = read_float(m_object + 0x18C) -- From OS.
 		obj_color_change_blue = read_float(m_object + 0x190) -- From OS.
@@ -726,7 +726,7 @@ function OnClientUpdate(player, m_objectId)
 		obj_color2_change4_red = read_float(m_object + 0x1DC) -- From OS.
 		obj_color2_change4_green = read_float(m_object + 0x1E0) -- From OS.
 		obj_color2_change4_blue = read_float(m_object + 0x1E4) -- From OS.
-		
+
 		--one of these are for interpolating:
 		obj_header_block_ref_node_orientation_size = read_word(m_object + 0x1E8) -- From OS.
 		obj_header_block_ref_node_orientation_offset = read_word(m_object + 0x1EA) -- From OS.
@@ -734,20 +734,20 @@ function OnClientUpdate(player, m_objectId)
 		obj_header_block_ref_node_orientation2_offset = read_word(m_object + 0x1EE) -- From OS.
 		obj_header_block_ref_node_matrix_block_size = read_word(m_object + 0x1F0) -- From OS.
 		obj_header_block_ref_node_matrix_block_offset = read_word(m_object + 0x1F2) -- From OS.
-		
+
 		--unkLong[2] 0x1E8-0x1F0 (???) Some sort of ID?
 		--obj_node_matrix_block = read_dword(m_object + 0x1F0) -- From OS. (???)
-		
+
 		if obj_type == 0 or obj_type == 1 then -- check if object is biped or vehicle
-			
+
 			--unit struct (applies to bipeds (players and AI) and vehicles)
 			m_unit = m_object
-			
+
 			unit_actor_index = readident(m_unit + 0x1F4) -- From OS.
 			unit_swarm_actor_index = readident(m_unit + 0x1F8) -- From OS.
 			unit_swarm_next_actor_index = readident(m_unit + 0x1FC) -- Guess.
 			unit_swarm_prev_obj_id = readident(m_unit + 0x200) -- From OS.
-			
+
 			--	Client Non-Instantaneous bitmask32
 			--	unkBit[4] 0-3 (???)
 				unit_is_invisible = read_bit(m_unit + 0x204, 4) -- Confirmed. (True if currently invisible, False if not)
@@ -785,7 +785,7 @@ function OnClientUpdate(player, m_objectId)
 				unit_grenade_presshold = read_bit(m_unit + 0x208, 13)	-- Confirmed. (True when holding right click, False when not)
 				unit_actionkey_presshold = read_bit(m_unit + 0x208, 14)	-- Confirmed. (True when holding action key,  False when not)
 			--	emptyBit[1] 15
-			
+
 			--unkWord[2] 0x20A-0x20E related to first two words in unit_global_data
 			--unit_shield_sapping = readchar(m_unit + 0x20E) -- (???) Always 0?
 			unit_base_seat_index = readchar(m_unit + 0x20F) -- From OS.
@@ -899,7 +899,7 @@ function OnClientUpdate(player, m_objectId)
 			unit_invis_scale = read_float(m_unit + 0x37C) -- Confirmed. How invisible you are. (0 to 1) (Completely = 1) (None = 0)
 			--unit_fullspectrumvision_scale = read_float(m_unit + 0x380) -- (???) Always 0, even when picking up a fullspectrum vision.
 			unit_dialogue_definition = readident(m_unit + 0x384) -- From OS.
-			
+
 			-->>SPEECH<<--
 			--AI Current Speech:
 			unit_speech_priority = read_word(m_unit + 0x388) -- From OS. (0 = None) (1 = Idle) (2 = Pain) (3 = Talk) (4 = Communicate) (5 = Shout) (6 = Script) (7 = Involuntary) (8 = Exclaim) (9 = Scream) (10 = Death)
@@ -921,7 +921,7 @@ function OnClientUpdate(player, m_objectId)
 				unit_ai_current_communication_broken = read_bit(m_unit + 0x3B4, 0) -- From OS. 1C false = reformed
 			--	unkBit[7] 1-7 (???)
 			--Padding[3] 0x3B5-0x3B8
-			
+
 			--AI Next Speech (I think):
 			unit_speech_priority2 = read_word(m_unit + 0x3B8) -- From OS. (0 = None) (1 = Idle) (2 = Pain) (3 = Talk) (4 = Communicate) (5 = Shout) (6 = Script) (7 = Involuntary) (8 = Exclaim) (9 = Scream) (10 = Death)
 			unit_speech_scream_type2 = read_word(m_unit + 0x3BA) -- From OS. (0 = Fear) (1 = Enemy Grenade) (2 = Pain) (3 = Maimed Limb) (4 = Maimed Head) (5 = Resurrection)
@@ -942,14 +942,14 @@ function OnClientUpdate(player, m_objectId)
 				unit_ai_current_communication_broken2 = read_bit(m_unit + 0x3E4, 0) -- From OS. 1C false = reformed
 			--	unkBit[7] 1-7 (???)
 			--Padding[3] 0x3E5-0x3E8
-			
+
 			--unkWord[4] 0x3E8-0x3F0
 			--unkLong[1] 0x3F0 time related
 			--unkBit[32] 0x3F4-0x3F8 0-31 (???)
 			--unkWord[4] 0x3F8-0x400 (???)
 			--unkLong[1] 0x400-0x404 (???)
 			-->>END OF SPEECH<<--
-			
+
 			unit_damage_type = read_word(m_unit + 0x404) -- Tested. (Not being damaged = 0) (Being damaged = 2) (Enum here) 10 when hit by plasma rifle
 			--unit_damage2 = read_word(m_unit + 0x406) -- Tested. Changes when damaged. Changes back.
 			--unit_damage3 = read_float(m_unit + 0x408) -- Tested. Changes when damaged. Changes back.
@@ -963,7 +963,7 @@ function OnClientUpdate(player, m_objectId)
 			--unit_stun_timer = read_word(m_unit + 0x428) -- (???) Always 0?
 			unit_killstreak = read_word(m_unit + 0x42A) -- Tested. Same as player_killstreak.
 			unit_last_kill_time = read_dword(m_unit + 0x42C) -- Confirmed. gameinfo_current_time - this = time since last kill time. (1 sec = 30 ticks)
-			
+
 			--I realize the below are confusing, and if you really don't understand them after looking at it, I will explain it if you contact me about them:
 			--I have no idea why halo stores these, only thing I can think of is because of betrayals or something.. but still..
 			unit_last_damage_time_by_mostrecent_objId = read_dword(m_unit + 0x430) -- Confirmed. gameinfo_current_time - this = Time since last taken damage by MOST RECENT object. (1 second = 30 ticks)
@@ -1028,12 +1028,12 @@ function OnClientUpdate(player, m_objectId)
 			unit_last_completed_client_update_id = read_dword(m_unit + 0x4BC) -- From OS.
 			--Padding[12] 0x4C0-0x4CC unused.
 		end
-		
+
 		if obj_type == 0 then -- check if object is a biped.
-		
+
 			-- Biped Struct. Definition is a two legged creature, but applies to ALL AI and all players.
 			m_biped = m_object
-			
+
 			--	bitmask32:
 				bipd_is_airborne = read_bit(m_biped + 0x4CC, 0) -- Confirmed. (Airborne = True, No = False)
 			--	bipd_is_slipping = read_bit(m_biped + 0x4CC, 1) -- (???) Always False?
@@ -1070,7 +1070,7 @@ function OnClientUpdate(player, m_objectId)
 			bipd_baseline_index = readchar(m_biped + 0x527) -- From OS.
 			bipd_message_index = readchar(m_biped + 0x528) -- From OS.
 			--Padding[3] 0x529-0x52C
-			
+
 			--	baseline update
 			bipd_primary_nades = read_byte(m_biped + 0x52C) -- Confirmed. Number of frag grenades.
 			bipd_secondary_nades = read_byte(m_biped + 0x52D) -- Confirmed. Number of plasma grenades.
@@ -1084,7 +1084,7 @@ function OnClientUpdate(player, m_objectId)
 			--	bitmask8
 			--	unkBit[8] 0x53C 0-7 (???)
 			--Padding[3] 0x53D-0x540
-			
+
 			--	delta update
 			--bipd_primary_nades2 = read_byte(m_biped + 0x540) -- (???) Always 0?
 			--bipd_secondary_nades2 = read_byte(m_biped + 0x541) -- (???) Always 0?
@@ -1095,7 +1095,7 @@ function OnClientUpdate(player, m_objectId)
 				bipd_shield_stun_time_greater_than_zero2 = read_bit(m_biped + 0x54C, 0) -- From OS.
 			--	unkBit[7] 1-7 (???)
 			--Padding[3] 0x54D-0x550
-			
+
 			--these are all just friggin rediculous...
 			function getBodyPart(address, offset)
 				address = address + (offset or 0x0)
@@ -1111,7 +1111,7 @@ function OnClientUpdate(player, m_objectId)
 				bodypart.z = read_float(address + 0x30) -- Confirmed.
 				return bodypart
 			end
-			
+
 			function getBodyPartLocation(address, offset)
 				address = address + (offset or 0x0)
 				--unkFloats[10] (???) Probably rotations.
@@ -1144,13 +1144,13 @@ function OnClientUpdate(player, m_objectId)
 			bipd_right_lower_arm = getBodyPart(m_biped + 0x85C)
 			bipd_left_hand = getBodyPart(m_biped + 0x890)
 			bipd_right_hand = getBodyPart(m_biped + 0x8C4)
-			
+
 			--The coordinates from these can be accessed doing the following
 			--let's say I want to tell the whole server the y coordinate of this object's right foot. I would do: say(bipd_right_foot.y)
 			say(bipd_right_foot.y) -- **SERVER**: 52.7130341548629
-		
+
 		elseif obj_type == 1 then -- check if object is a vehicle
-		
+
 			-- vehi struct
 			-- Thank you 002 and shaft for figuring out that there's a struct here:
 			--	bitmask16:
@@ -1309,7 +1309,7 @@ function OnClientUpdate(player, m_objectId)
 			client_machine_player_cdhash = read_string(client_machineinfo_struct + 0xA0, 32) -- From Phasor.
 			--unkByte[76] 0xC0 (???) Maybe Padding? Nothing here. Possibly was going to be used for something else?
 		end
-		
+
 	-- machine struct
 	--I've found two methods of getting this struct :D
 	local method = 1
@@ -1329,7 +1329,7 @@ function OnClientUpdate(player, m_objectId)
 	machine_player_fourth_ip_byte = read_byte(machine_struct + 0x3) -- Confirmed. 1 if host.
 	machine_player_ip_address = string.format("%i.%i.%i.%i", machine_player_first_ip_byte, machine_player_second_ip_byte, machine_player_third_ip_byte, machine_player_fourth_ip_byte) -- Player's IP Address (127.0.0.1 if host)
 	machine_player_port = read_word(machine_struct + 0x4) -- Confirmed. Usually 2303.
-		
+
 		-- address/offset checker
 		--hprintf("---")
 
@@ -1355,7 +1355,7 @@ function OnObjectCreation(m_objectId)
 			-- item struct
 			-- This applies to equipment, weapons, and garbage only.
 			item_struct = m_object
-			
+
 			--	bitmask32:
 				item_in_inventory = read_bit(item_struct + 0x1F4, 0) -- From OS.
 			--	unkBit[31] 1-31 (Padding Maybe?)
@@ -1374,12 +1374,12 @@ function OnObjectCreation(m_objectId)
 			item_unknown_z_vel = read_float(item_struct + 0x220)
 			item_unknown_xy_angle = read_float(item_struct + 0x224)
 			item_unknown_z_angle = read_float(item_struct + 0x228)
-			
+
 			if obj_type == 2 then -- weapons
-			
+
 				-- weap struct
 				weap_struct = m_object
-				
+
 				weap_meta_id = read_dword(weap_struct) -- Confirmed with HMT. Tag Meta ID.
 				weap_fuel = read_float(weap_struct + 0x124) -- Confirmed. Only for Flamethrower. (0 to 1)
 				weap_charge = read_float(weap_struct + 0x140) -- Confirmed. Only for Plasma Pistol. (0 to 1)
@@ -1403,7 +1403,7 @@ function OnObjectCreation(m_objectId)
 				--Padding[8] 0x254-0x25C Unused.
 				weap_alt_shots_loaded = read_word(weap_struct + 0x25C) -- From OS.
 				--Padding[2] 0x25E-0x260
-		
+
 				--Trigger State:
 				--Padding[1] 0x260-0x261
 				weap_trigger_state = read_byte(weap_struct + 0x261) -- From OS. Some counter.
@@ -1435,7 +1435,7 @@ function OnObjectCreation(m_objectId)
 				--unkFloat[1] 0x2A4-0x2A8 used in the calculation of projectile error angle
 				weap_trigger2_charging_effect_id = readident(weap_struct + 0x2A8) -- From OS.
 				--unkByte[4] 0x2AC-0x2B0 (???)
-		
+
 				--Primary Magazine State:
 				weap_mag1_state = read_word(weap_struct + 0x2B0) -- From OS. (0 = Idle) (1 = Chambering Start) (2 = Chambering Finish) (3 = Chambering)
 				weap_mag1_chambering_time = read_word(weap_struct + 0x2B2) -- From OS. Can set to 0 to finish reloading. (1 sec = 30 ticks)
@@ -1443,7 +1443,7 @@ function OnObjectCreation(m_objectId)
 				weap_primary_ammo = read_word(weap_struct + 0x2B6) -- Confirmed. Unloaded ammo for magazine 1.
 				weap_primary_clip = read_word(weap_struct + 0x2B8) -- Confirmed. Loaded clip for magazine 1.
 				--unkWord[3] 0x2BA-0x2C0 game tick value,unkWord,possible enum
-		
+
 				--Secondary Magazine State:
 				weap_mag2_state = read_word(weap_struct + 0x2C0) -- From OS. (0 = Idle) (1 = Chambering Start) (2 = Chambering Finish) (3 = Chambering)
 				weap_mag2_chambering_time = read_word(weap_struct + 0x2C2) -- From OS. Can set to 0 to finish reloading. (1 sec = 30 ticks)
@@ -1473,10 +1473,10 @@ function OnObjectCreation(m_objectId)
 				weap_age2 = read_float(weap_struct + 0x304) -- From OS. Equal to 1 - batteries. (0 to 1)
 				--Duplicates of above below this point, will add later.
 			elseif obj_type == 3 then -- equipment
-				
+
 				-- eqip struct
 				eqip_struct = item_struct
-				
+
 				--unkByte[16] 0x22C-0x23C (???) possibly unused?
 				--unkByte[8] 0x23C-0x244 (???) possibly unused?
 				--	bitmask8:
@@ -1495,7 +1495,7 @@ function OnObjectCreation(m_objectId)
 				eqip_pitch_vel = read_float(eqip_struct + 0x260) -- From OS.
 				eqip_yaw_vel = read_float(eqip_struct + 0x264) -- From OS.
 				eqip_roll_vel = read_float(eqip_struct + 0x268) -- From OS.
-				
+
 				--	delta update
 				--	bitmask8:
 					eqip_delta_valid = read_bit(eqip_struct + 0x26C, 0) -- Guess.
@@ -1510,23 +1510,23 @@ function OnObjectCreation(m_objectId)
 				eqip_pitch_vel2 = read_float(eqip_struct + 0x288) -- From OS.
 				eqip_yaw_vel2 = read_float(eqip_struct + 0x28C) -- From OS.
 				eqip_roll_vel2 = read_float(eqip_struct + 0x290) -- From OS.
-				
+
 			elseif obj_type == 4 then -- garbage object
-				
+
 				-- garbage struct
 				garb_struct = item_struct
-				
+
 				garb_time_until_garbage = read_word(garb_struct + 0x22C) -- From OS.
 				--Padding[2] 0x22E-0x230
 				--Padding[20] 0x230-0x244 unused
-				
+
 			elseif obj_type == 5 then -- projectile
-				
+
 				-- proj struct
 				proj_struct = m_object
-				
+
 				--It appears Smiley didn't know how to read Open-Sauce very effectively, which explains the previous failure in this projectile structure's documentation:
-				
+
 				proj_mapId = readident(proj_struct + 0x0) -- Confirmed.
 				--INSERT REST OF OBJECT STRUCT FROM 0x4 TO 0x1F4 HERE
 				--Padding[52] 0x1F4-0x22C -- Item data struct not used in projectile.
@@ -1555,7 +1555,7 @@ function OnObjectCreation(m_objectId)
 				--	unkBit[7] 1-7
 				proj_baseline_index = readchar(proj_struct + 0x27A) -- From OS.
 				proj_message_index = readchar(proj_struct + 0x27B) -- From OS.
-				
+
 				--	baseline update
 				proj_x_coord = read_float(proj_struct + 0x27C) -- From OS.
 				proj_y_coord = read_float(proj_struct + 0x280) -- From OS.
@@ -1565,7 +1565,7 @@ function OnObjectCreation(m_objectId)
 				proj_z_vel2 = read_float(proj_struct + 0x290) -- From OS.
 				--unkBit[8] 0x294-0x295 delta_valid?
 				--Padding[3] 0x295-0x298
-				
+
 				--	delta update
 				proj_x_coord2 = read_float(proj_struct + 0x298) -- From OS.
 				proj_y_coord2 = read_float(proj_struct + 0x29C) -- From OS.
@@ -1573,12 +1573,12 @@ function OnObjectCreation(m_objectId)
 				proj_x_vel3 = read_float(proj_struct + 0x2A4) -- From OS.
 				proj_y_vel3 = read_float(proj_struct + 0x2A8) -- From OS.
 				proj_z_vel3 = read_float(proj_struct + 0x2AC) -- From OS.
-				
+
 			elseif obj_type >= 6 and obj_type <= 9 then -- device
-				
+
 				-- device struct
 				device_struct = m_object
-				
+
 				device_flags = read_dword(device_struct + 0x1F4) -- breakdown coming soon!
 				device_power_group_index = read_word(device_struct + 0x1F8) -- From OS.
 				--Padding[2] 0x1FA-0x1FC
@@ -1592,39 +1592,39 @@ function OnObjectCreation(m_objectId)
 					device_one_sided = read_bit(device_struct + 0x210, 0) -- From OS.
 					device_operates_automatically = read_bit(device_struct + 0x210, 1) -- From OS.
 				--	unkBit[30] 2-31 (Padding Maybe?)
-				
+
 				if obj_type == 7 then -- machine
-					
+
 					-- mach struct
 					mach_struct = device_struct
-					
+
 					mach_flags = read_dword(mach_struct + 0x214) -- breakdown coming soon!
 					mach_door_timer = read_dword(mach_struct + 0x218) -- Tested. looks like a timer used for door-type machines.
 					mach_elevator_x_coord = read_dword(mach_struct + 0x21C) -- From OS.
 					mach_elevator_y_coord = read_dword(mach_struct + 0x220) -- From OS.
 					mach_elevator_z_coord = read_dword(mach_struct + 0x224) -- From OS.
-					
+
 				elseif obj_type == 8 then -- control
-					
+
 					-- ctrl struct
 					ctrl_struct = device_struct
-					
+
 					ctrl_flags = read_dword(mach_struct + 0x214) -- breakdown coming soon!
 					ctrl_custom_name_index = read_word(mach_struct + 0x218) -- From OS.
 					--Padding[2] 0x21A-0x21C
-				
+
 				elseif obj_type == 9 then -- lightfixture
-					
+
 					--lightfixture struct
 					lifi_struct = device_struct
-					
+
 					lifi_red_color = read_float(lifi_struct + 0x214) -- From OS.
 					lifi_green_color = read_float(lifi_struct + 0x218) -- From OS.
 					lifi_blue_color = read_float(lifi_struct + 0x21C) -- From OS.
 					lifi_intensity = read_float(lifi_struct + 0x220) -- From OS.
 					lifi_falloff_angle = read_float(lifi_struct + 0x224) -- From OS.
 					lifi_cutoff_angle = read_float(lifi_struct + 0x228) -- From OS.
-					
+
 				end
 			end
 		end
@@ -1647,7 +1647,7 @@ function getplayer(player_number)
 	-- player header setup
 	local player_header = read_dword(player_header_pointer) - 0x8 -- Confirmed. (0x4029CE88)
 	local player_header_size = 0x40 -- Confirmed.
-	
+
 	-- player header
 	--Padding[8] 0x0-0x8
 	local player_header_name = read_string(player_header + 0x8, 0xE) -- Confirmed. Always "players".
@@ -1746,7 +1746,7 @@ function gettagaddress(tagtype, tagname)
 	local tag_table_size = 0x20 -- Confirmed.
 	local tag_allocation_size = 0x01700000 -- From OS.
 	local tag_max_address = map_base + tag_allocation_size -- From OS. (0x41B40000)
-	
+
 	-- tag table
 	-- the scenario is always the first tag located in the table.
 	local scnr_tag_class1 = read_string(tag_table_base, 4, true) -- Confirmed. "weap", "obje", etc. (weap = paew). Never 0xFFFF.
@@ -1757,21 +1757,21 @@ function gettagaddress(tagtype, tagname)
 		local scnr_tag_name = read_string(scnr_tag_name_address) -- Confirmed. Name of the tag ("weapons\\pistol\\pistol")
 	local scnr_tag_data_address = read_dword(tag_table_base + 0x14) -- Confirmed. This is where map mods made with Eschaton/HMT/HHT are stored.
 	--unkByte[8]
-	
+
 	local tag_address = 0
 	for i=0,(tag_table_count - 1) do
-	
+
 		local tag_class = read_string(tag_table_base, (tag_table_size * i), 4)
 		local tag_id = read_dword(tag_table_base + 0xC + (tag_table_size * i))
 		local tag_name_address = read_dword(tag_table_base + 0x10 + tag_table_size * i)
 		local tag_name = read_string(tag_name_address)
-		
+
 		--this function can accept mapId or tagtype, tagname
 		if tag_id == tagtype or (tag_class == tagtype and tag_name == tagname) then
 			tag_address = todec(read_dword(tag_table_base + 0x14 + (tag_table_size * i)))
 			break
 		end
-		
+
 	end
 
 	return tag_address
