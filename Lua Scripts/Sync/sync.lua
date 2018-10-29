@@ -191,7 +191,7 @@ bipd_baseline_message_struct = {
 	{ def_object.unit.shooting, size = 1 },
 
 	actions_when_recieved = {
-		{ def_object.unit.facing, copy_to = def_object.unit.aim }
+		{ def_object.unit.aim, copy_from = def_object.unit.facing }
 	},
 	size = GetMessageSize(bipd_baseline_message_struct)
 }
@@ -208,8 +208,8 @@ bipd_action_message_struct = {
 
 	actions_when_recieved = {
 		{ def_object.animation_frame, set_to = 0 },
-		{ def_object.unit.desired_aim, copy_to = def_object.unit.facing },
-		{ def_object.unit.desired_aim, copy_to = def_object.unit.aim }
+		{ def_object.unit.facing, copy_from = def_object.unit.desired_aim },
+		{ def_object.unit.aim, copy_from = def_object.unit.desired_aim }
 	},
 	size = GetMessageSize(bipd_action_message_struct)
 }
@@ -220,7 +220,7 @@ bipd_rotation_message_struct = {
 	{ def_object.unit.shooting, size = 1 },
 
 	actions_when_recieved = {
-		{ def_object.unit.facing, copy_to = def_object.unit.aim }
+		{ def_object.unit.aim, copy_from = def_object.unit.facing }
 	},
 	size = GetMessageSize(bipd_rotation_message_struct)
 }
