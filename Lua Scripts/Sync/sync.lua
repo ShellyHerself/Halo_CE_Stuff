@@ -193,8 +193,7 @@ bipd_baseline_message_struct = {
 	actions_when_recieved = {
 		{ def_object.unit.aim, copy_from = def_object.unit.facing }
 	},
-	size = GetMessageSize(bipd_baseline_message_struct)
-}
+} bipd_baseline_message_struct.size = GetMessageSize(bipd_baseline_message_struct)
 
 bipd_action_message_struct = {
 	{ def_object.position, size = 4*3 },
@@ -211,8 +210,7 @@ bipd_action_message_struct = {
 		{ def_object.unit.facing, copy_from = def_object.unit.desired_aim },
 		{ def_object.unit.aim, copy_from = def_object.unit.desired_aim }
 	},
-	size = GetMessageSize(bipd_action_message_struct)
-}
+} bipd_action_message_struct.size = GetMessageSize(bipd_action_message_struct)
 
 bipd_rotation_message_struct = {
 	{ def_object.unit.facing, size = 1*3 },
@@ -222,22 +220,18 @@ bipd_rotation_message_struct = {
 	actions_when_recieved = {
 		{ def_object.unit.aim, copy_from = def_object.unit.facing }
 	},
-	size = GetMessageSize(bipd_rotation_message_struct)
-}
+} bipd_rotation_message_struct.size = GetMessageSize(bipd_rotation_message_struct)
 
 bipd_spawn_message_struct = {
 	{ def_object.color_change_a, size = 1*3, copy_from_cached_value = true },
 	{ def_object.weapon_1_object_id, size = 3, convert_object_id_to_tag_id = true },
 
 	action_when_recieved = {
-	--	{ def_object.weapon_1_object_id } -- set_to = spawn_object and parent it to the biped
-	}
-	size = GetMessageSize(bipd_spawn_message_struct)
-}
+		{ def_object.weapon_1_object_id, make_child_object_from_tag_id = true } -- set_to = spawn_object and parent it to the biped
+	},
+} bipd_spawn_message_struct.size = GetMessageSize(bipd_spawn_message_struct)
 
 proj_spawn_message_struct = {
 	{ def_object.position, size = 4*3 },
 	{ def_object.velocity, size = 3*3 },
-
-	size = GetMessageSize(proj_spawn_message_struct)
-}
+} proj_spawn_message_struct.size = GetMessageSize(proj_spawn_message_struct)
