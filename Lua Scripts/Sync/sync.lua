@@ -72,17 +72,17 @@ end
 
 -- used for parsing and conversion
 types = {
-	u8    = { read = read_u8   , write = write_u8   , round = true , bounds = {0,255} },
-	i8    = { read = read_i8   , write = write_i8   , round = true , bounds = {-127,127} },
+	u8    = { read = read_u8   , write = write_u8   , int = true , bounds = {0,255} },
+	i8    = { read = read_i8   , write = write_i8   , int = true , bounds = {-127,127} },
 
-	u16   = { read = read_u16  , write = write_u16  , round = true , bounds = {0,65535} },
-	i16   = { read = read_i16  , write = write_i16  , round = true , bounds = {-32767,32767} },
+	u16   = { read = read_u16  , write = write_u16  , int = true , bounds = {0,65535} },
+	i16   = { read = read_i16  , write = write_i16  , int = true , bounds = {-32767,32767} },
 
-	u32   = { read = read_u32  , write = write_u32  , round = true , bounds = {0,4294967295} },
-	i32   = { read = read_i32  , write = write_i32  , round = true , bounds = {-2147483647,2147483647} },
+	u32   = { read = read_u32  , write = write_u32  , int = true , bounds = {0,4294967295} },
+	i32   = { read = read_i32  , write = write_i32  , int = true , bounds = {-2147483647,2147483647} },
 
-	f32   = { read = read_f32  , write = write_f32  , round = false },
-	vec3d = { read = read_vec3d, write = write_vec3d, round = false, value_count = 3 }
+	f32   = { read = read_f32  , write = write_f32  , int = false },
+	vec3d = { read = read_vec3d, write = write_vec3d, int = false, value_count = 3 }
 
 }
 -- shared functions
