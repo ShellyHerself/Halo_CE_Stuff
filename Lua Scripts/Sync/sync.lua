@@ -197,6 +197,7 @@ bipd_baseline_message_def = {
 	},
 } bipd_baseline_message_def.size = GetMessageSize(bipd_baseline_message_def)
 
+
 bipd_action_message_def = {
 	{ def_object.position, size = 4*3 },
 	{ def_object.rotation, size = 1*3 },
@@ -214,6 +215,7 @@ bipd_action_message_def = {
 	},
 } bipd_action_message_def.size = GetMessageSize(bipd_action_message_def)
 
+
 bipd_rotation_message_def = {
 	{ def_object.unit.facing, size = 1*3 },
 	{ def_object.unit.desired_aim, size = 1*3 },
@@ -224,6 +226,7 @@ bipd_rotation_message_def = {
 	},
 } bipd_rotation_message_def.size = GetMessageSize(bipd_rotation_message_def)
 
+
 bipd_spawn_message_def = {
 	{ def_object.color_change_a, size = 1*3, copy_from_cached_value = true },
 	{ def_object.weapon_1_object_id, size = 3, convert_object_id_to_tag_id = true },
@@ -232,6 +235,7 @@ bipd_spawn_message_def = {
 		{ def_object.weapon_1_object_id, make_child_object_from_tag_id = true } -- set_to = spawn_object and parent it to the biped
 	},
 } bipd_spawn_message_def.size = GetMessageSize(bipd_spawn_message_def)
+
 
 proj_spawn_message_def = {
 	{ def_object.position, size = 4*3 },
