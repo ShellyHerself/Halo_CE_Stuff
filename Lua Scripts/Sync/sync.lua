@@ -371,7 +371,7 @@ for k,v in pairs(message_definitions) do
 		end
 
 		if current_entry.bounds ~= nil then
-			current_entry.bounds_length = current_entry.bounds[1] - current_entry.bounds[2]
+			current_entry.bounds_length = current_entry.bounds[2] - current_entry.bounds[1]
 		end
 	end
 
@@ -422,7 +422,7 @@ function PackTableIntoBytes(table, n_values, n_bytes)
 			bits_for_cur = bits_for_cur + 1
 			leftover_bits = leftover_bits - 1
 		end
-		local cur = CheckValueBounds(RoundToInt(table[i] * (2^bits_for_cur)), 0, 2^bits_for_cur-1)
+		local cur = CheckValueBounds(RoundToInt(table[i] * (2^bits_for_cur-1)), 0, 2^bits_for_cur-1)
 		sum = sum * (2^bits_for_cur) + cur --shift left and add current value at end
 	end
 	return sum
@@ -442,10 +442,9 @@ function UnpackBytesIntoTable(number, n_values, n_bytes)
 		local bits_for_cur = least_bits_per_var
 		if i > n_vars_with_no_extra_bit then
 			bits_for_cur = bits_for_cur + 1
-			leftover_bits = leftover_bits - 1
 		end
-		table[n_values-i+1] = number % (2^bits_for_cur) / (2^bits_for_cur)
-		number = math.floor(number / (2^bits_for_cur))
+		table[n_values-i+1] = number % (2^bits_for_cur) / (2^bits_for_cur-1)
+		number = RoundToInt(number / (2^bits_for_cur))
 	end
 	return table
 end
@@ -491,7 +490,7 @@ function ConvertValuesToMessage(message_definition, value_table)
 
 				if current_def.scale_to_bounds then
 					value = CheckValueBounds(value, table.unpack(current_def.bounds))
-					value = (value + current_def.bounds_length/2) / current_def.bounds_length
+					value = (value - current_def.bounds[1]) / current_def.bounds_length
 					value = CheckValueBounds(RoundToInt(value*BASE255_MAX_SIZES[size]),0, BASE255_MAX_SIZES[size])
 
 					message = message .. AddLeadingCharacters(EncodeBase255(value), size)
@@ -507,14 +506,14 @@ function ConvertValuesToMessage(message_definition, value_table)
 			if current_def.size > 8 then print("Error: A part of a message has a size that when modulo by the number of values is performed onto it the output is != 0. And the size is over 8. Shit's gonna break.") end
 
 			for k,v in pairs(current_values) do
-				current_values[k] = (current_values[k] + current_def.mid) / current_def.bounds_length
+				current_values[k] = (current_values[k] - current_def.bounds[1]) / current_def.bounds_length
 				current_values[k] = CheckValueBounds(current_values[k], table.unpack(current_def.bounds))
 			end
 			local packed_numbers = PackTableIntoBytes(current_values, current_def.value_count, current_def.size)
 			      packed_numbers = RoundToInt(packed_numbers * BYTE_TO_BASE255_CONV_SCALES[current_def.size])
-			      packed_numbers = CheckValueBounds(packed_numbers, 0, BASE255_MAX_SIZES[size])
+			      packed_numbers = CheckValueBounds(packed_numbers, 0, BASE255_MAX_SIZES[current_def.size])
 
-			message = message .. AddLeadingCharacters(EncodeBase255(value), size)
+			message = message .. AddLeadingCharacters(EncodeBase255(packed_numbers), current_def.size)
 		end
 		i = i + 1
 	until message_definition.message[i] == nil
@@ -538,7 +537,8 @@ function ConvertMessageToValues(message_definition, message)
 
 				if current_def.scale_to_bounds then
 					local value = DecodeBase255(piece) / BASE255_MAX_SIZES[size]
-					      value = value * current_def.bounds_length - current_def.bounds_length/2
+					      value = value * current_def.bounds_length + current_def.bounds[1]
+
 
 					table.insert(current_values, value)
 				else
@@ -558,7 +558,7 @@ function ConvertMessageToValues(message_definition, message)
 			current_values = UnpackBytesIntoTable(packed_numbers, current_def.value_count, current_def.size)
 
 			for k,v in pairs(current_values) do
-				current_values[k] = current_values[k] * current_def.bound_length - current_def.mid
+				current_values[k] = current_values[k] * current_def.bounds_length + current_def.bounds[1]
 			end
 		end
 		sum_of_prev_sizes = sum_of_prev_sizes + current_def.size
