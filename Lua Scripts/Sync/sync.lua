@@ -534,18 +534,18 @@ function ConvertMessageToValues(message_definition, message)
 		if current_def.size % current_def.value_count == 0 then
 			for k=0,current_def.value_count-1 do
 				local piece = string.sub(message, sum_of_prev_sizes + k*size + 1, sum_of_prev_sizes + k*size + size)
-
+				local value = 0
+				
 				if current_def.scale_to_bounds then
-					local value = DecodeBase255(piece) / BASE255_MAX_SIZES[size]
-					      value = value * current_def.bounds_length + current_def.bounds[1]
-
-
-					table.insert(current_values, value)
+					value = DecodeBase255(piece) / BASE255_MAX_SIZES[size]
+					value = value * current_def.bounds_length + current_def.bounds[1]
 				else
-					local value = DecodeBase255(piece)
-
-					table.insert(current_values, value)
+					value = DecodeBase255(piece)
 				end
+				if current_def.int then
+					value = CheckValueBounds(RoundToInt(value), current_def.bounds[1], current_def.bounds[2])
+				end
+				table.insert(current_values, value)
 			end
 
 		else
