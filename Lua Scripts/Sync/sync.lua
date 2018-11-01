@@ -208,10 +208,10 @@ offsets = {
 		health_region6 = { offset = 0x17D, type = types.u8, scale_to_bounds = true },
 		health_region7 = { offset = 0x17E, type = types.u8, scale_to_bounds = true },
 		health_region8 = { offset = 0x17F, type = types.u8, scale_to_bounds = true },
-		color_change_a = { offset = 0x188, type = types.vec_3d, bounds = {0,1} },
-		color_change_b = { offset = 0x194, type = types.vec_3d, bounds = {0,1} },
-		color_change_c = { offset = 0x1A0, type = types.vec_3d, bounds = {0,1} },
-		color_change_d = { offset = 0x1AC, type = types.vec_3d, bounds = {0,1} },
+		color_change_a = { offset = 0x188, type = types.vec3d, bounds = {0,1} },
+		color_change_b = { offset = 0x194, type = types.vec3d, bounds = {0,1} },
+		color_change_c = { offset = 0x1A0, type = types.vec3d, bounds = {0,1} },
+		color_change_d = { offset = 0x1AC, type = types.vec3d, bounds = {0,1} },
 		unit = { -- seperated these because these only match for units
 			facing = { offset = 0x224, type = types.vec3d, bounds = {-1,1} },
 			desired_aim = { offset = 0x230, type = types.vec3d, bounds = {-1,1} },
@@ -238,17 +238,19 @@ offsets = {
 -- message definitions
 ------------------------
 
+RPRINT_MAX_LENGTH = 80-1 -- -1 is for the null terminator
+
 message_header_def = {
 	message = {
 		{ identifier = 0, size = 1 },
-		{ object_identifier = 0, size = 1 }
+		{ object_identifier = 0, size = 2 }
 	},
-	size = 2
+	size = 3
 }
 
 
 unit_velocity_bounds = {-2.5,2.5}
-proj_velocity_bounds = {-1000/30,1000/30}
+proj_velocity_bounds = {-1000/30,1000/30} -- The fastest projectile I know of is the sniper projectile which moves at 1000 wu/s, but velocity is stored in wu/tick.
 
 
 bipd_baseline_message_def = {
@@ -325,7 +327,7 @@ message_definitions = {
 	{ bipd_baseline_message_def, id = 151 },
 	{ bipd_action_message_def, id = 152 },
 	{ bipd_rotation_message_def, id = 153 },
-	--{ bipd_spawn_message_def, id = 154 },
+	{ bipd_spawn_message_def, id = 154 },
 
 	{ proj_spawn_message_def, id = 155 }
 }
@@ -402,7 +404,7 @@ function WriteValuesUsingOffsetList(address, message_definition, value_table)
 	until message_definition[i] == nil
 end
 
--- Functions for packing numbers into bytes when you can't get an integer from deviding n_bytes by n_values
+-- Functions for packing numbers into bytes when the number of bytes can't be properly devided by the number of values
 
 -- Packs multiple vars inside the bounds of 0-1 into the given number of bytes.
 function PackTableIntoBytes(table, n_values, n_bytes)
@@ -479,7 +481,7 @@ end
 function ConvertValuesToMessage(message_definition, value_table)
 	local message = ""
 	local i = 1
-	repeat
+	for k,v in pairs(message_definition.message) do
 		local current_def = message_definition.message[i]
 		local current_values = value_table[i]
 		local size = current_def.size / current_def.value_count
@@ -506,8 +508,8 @@ function ConvertValuesToMessage(message_definition, value_table)
 			if current_def.size > 8 then print("Error: A part of a message has a size that when modulo by the number of values is performed onto it the output is != 0. And the size is over 8. Shit's gonna break.") end
 
 			for k,v in pairs(current_values) do
-				current_values[k] = (current_values[k] - current_def.bounds[1]) / current_def.bounds_length
 				current_values[k] = CheckValueBounds(current_values[k], table.unpack(current_def.bounds))
+				current_values[k] = (current_values[k] - current_def.bounds[1]) / current_def.bounds_length
 			end
 			local packed_numbers = PackTableIntoBytes(current_values, current_def.value_count, current_def.size)
 			      packed_numbers = RoundToInt(packed_numbers * BYTE_TO_BASE255_CONV_SCALES[current_def.size])
@@ -516,7 +518,7 @@ function ConvertValuesToMessage(message_definition, value_table)
 			message = message .. AddLeadingCharacters(EncodeBase255(packed_numbers), current_def.size)
 		end
 		i = i + 1
-	until message_definition.message[i] == nil
+	end
 
 	return message
 end
@@ -526,7 +528,7 @@ function ConvertMessageToValues(message_definition, message)
 	local value_table = {}
 	local i = 1
 	local sum_of_prev_sizes = 0
-	repeat
+	for k,v in pairs(message_definition.message) do
 		local current_def = message_definition.message[i]
 		local current_values = {}
 		local size = current_def.size / current_def.value_count
@@ -535,7 +537,7 @@ function ConvertMessageToValues(message_definition, message)
 			for k=0,current_def.value_count-1 do
 				local piece = string.sub(message, sum_of_prev_sizes + k*size + 1, sum_of_prev_sizes + k*size + size)
 				local value = 0
-				
+
 				if current_def.scale_to_bounds then
 					value = DecodeBase255(piece) / BASE255_MAX_SIZES[size]
 					value = value * current_def.bounds_length + current_def.bounds[1]
@@ -564,7 +566,7 @@ function ConvertMessageToValues(message_definition, message)
 		sum_of_prev_sizes = sum_of_prev_sizes + current_def.size
 		table.insert(value_table, current_values)
 		i = i + 1
-	until message_definition.message[i] == nil
+	end
 
 	return value_table
 end
