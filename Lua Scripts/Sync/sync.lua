@@ -336,8 +336,7 @@ message_definitions = {
 for k,v in pairs(message_definitions) do
 	current_message = message_definitions[k][1]
 	current_message.size = 0
-	-- we do a while loop here because the k,v in pairs() method iterates over named table entries, and we don't want that.
-	--print("table")
+
 	for i=1,#current_message.message do
 		local current_entry = current_message.message[i]
 
@@ -485,7 +484,7 @@ function ConvertValuesToMessage(message_definition, value_table)
 		local current_def = message_definition.message[i]
 		local current_values = value_table[i]
 		local size = current_def.size / current_def.value_count
-		--print(current_def.size.." "..current_def.value_count.." "..current_def.size % current_def.value_count)
+
 		if current_def.size % current_def.value_count == 0 then
 			for k,v in pairs(current_values) do
 				local value = current_values[k]
