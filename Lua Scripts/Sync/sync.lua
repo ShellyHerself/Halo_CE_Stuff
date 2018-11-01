@@ -480,8 +480,8 @@ end
 -- Encodes a table into a Base255 string using the given message definition.
 function ConvertValuesToMessage(message_definition, value_table)
 	local message = ""
-	local i = 1
-	for k,v in pairs(message_definition.message) do
+
+	for i,v in pairs(message_definition.message) do
 		local current_def = message_definition.message[i]
 		local current_values = value_table[i]
 		local size = current_def.size / current_def.value_count
@@ -517,7 +517,6 @@ function ConvertValuesToMessage(message_definition, value_table)
 
 			message = message .. AddLeadingCharacters(EncodeBase255(packed_numbers), current_def.size)
 		end
-		i = i + 1
 	end
 
 	return message
@@ -526,9 +525,8 @@ end
 -- Decodes a Base255 string into a table using the given message definition.
 function ConvertMessageToValues(message_definition, message)
 	local value_table = {}
-	local i = 1
 	local sum_of_prev_sizes = 0
-	for k,v in pairs(message_definition.message) do
+	for i,v in pairs(message_definition.message) do
 		local current_def = message_definition.message[i]
 		local current_values = {}
 		local size = current_def.size / current_def.value_count
@@ -565,7 +563,6 @@ function ConvertMessageToValues(message_definition, message)
 		end
 		sum_of_prev_sizes = sum_of_prev_sizes + current_def.size
 		table.insert(value_table, current_values)
-		i = i + 1
 	end
 
 	return value_table
