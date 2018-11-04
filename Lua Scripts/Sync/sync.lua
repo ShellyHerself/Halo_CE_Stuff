@@ -195,11 +195,14 @@ offsets = {
 		position = { offset = 0x5C, type = types.vec3d, bounds = {-5000,5000} },
 		velocity = { offset = 0x68, type = types.vec3d },
 		rotation = { offset = 0x74, type = types.vec3d, bounds = {-1,1} },
+		scale = { offset = 0xB0, type = types.f32, bounds = {0,100} },
 		type = { offset = 0xB4, type = types.u16 },
-		animation_id = { offset = 0xD0, type = types.u16},
+		namelist_index = { offset = 0xBA, type = types.u16, bounds = {-1,511} },
+		animation_id = { offset = 0xD0, type = types.u16, bounds = {0,2047} },
 		animation_frame = { offset = 0xD2, type = types.u16},
 		health = { offset = 0xE0, type = types.f32, bounds = {0,1} },
 		shield = { offset = 0xE4, type = types.f32, bounds = {0,3} },
+		shader_permutation = { offset = 0x176, type = u16 },
 		health_region1 = { offset = 0x178, type = types.u8, scale_to_bounds = true },
 		health_region2 = { offset = 0x179, type = types.u8, scale_to_bounds = true },
 		health_region3 = { offset = 0x17A, type = types.u8, scale_to_bounds = true },
@@ -212,21 +215,37 @@ offsets = {
 		color_change_b = { offset = 0x194, type = types.vec3d, bounds = {0,1} },
 		color_change_c = { offset = 0x1A0, type = types.vec3d, bounds = {0,1} },
 		color_change_d = { offset = 0x1AC, type = types.vec3d, bounds = {0,1} },
+		color_change2_a = { offset = 0x1B8, type = types.vec3d, bounds = {0,1} },
+		color_change2_b = { offset = 0x1C4, type = types.vec3d, bounds = {0,1} },
+		color_change2_c = { offset = 0x1D0, type = types.vec3d, bounds = {0,1} },
+		color_change2_d = { offset = 0x1DC, type = types.vec3d, bounds = {0,1} },
 		unit = { -- seperated these because these only match for units
+			emotion_animation_index = { offset = 0x21E, type = types.u16 },
 			facing = { offset = 0x224, type = types.vec3d, bounds = {-1,1} },
 			desired_aim = { offset = 0x230, type = types.vec3d, bounds = {-1,1} },
 			aim = { offset = 0x23C, type = types.vec3d, bounds = {-1,1} },
+			forward_throttle = { offset = 0x278, type = types.f32, bounds = {-1,1} },
+			sideways_throttle = { offset = 0x27C, type = types.f32, bounds = {-1,1} }, -- -1 = right, +1 = left
+			up = { offset = 0x280, type = types.f32, bounds = {-1,1} },
 			shooting = { offset = 0x284, type = types.f32, bounds = {0,1} },
+			ticks_until_flaming_death = { offset = 0x28A, type = types.i8 },
+			throwing_grenade_state = { offset = 0x28D, type = types.u8, bounds = {0,3} }, -- (0 = not throwing) (1 = Arm leaning back) (2 = Grenade leaving hand) (3 = Grenade Thrown, going back to normal state)
+			thrown_grenade_obj_id = { offset = 0x294, type = types.i16, bounds = {-1,2046} },
 			animation_unit = { offset = 0x2A0, type = types.u8 },
 			weapon_slot = { offset = 0x2A1, type = types.u8, bounds = {0,3} },
 			animation_state = { offset = 0x2A3, type = types.u8 },
 			animation_state2 = { offset = 0x2A6, type = types.u8 },
 			animation_overlay_id = { offset = 0x2AA, type = types.i16 },
 			animation_overlay_frame = { offset = 0x2AC, type = types.i16 },
-			weapon_1_object_id = { offset = 0x2F8, type = types.i16 },
-			weapon_2_object_id = { offset = 0x2FC, type = types.i16 },
-			weapon_3_object_id = { offset = 0x300, type = types.i16 },
-			weapon_4_object_id = { offset = 0x304, type = types.i16 },
+			weapon_1_object_id = { offset = 0x2F8, type = types.i16, bounds = {-1,2046} },
+			weapon_2_object_id = { offset = 0x2FC, type = types.i16, bounds = {-1,2046} },
+			weapon_3_object_id = { offset = 0x300, type = types.i16, bounds = {-1,2046} },
+			weapon_4_object_id = { offset = 0x304, type = types.i16, bounds = {-1,2046} },
+			current_nade_type = { offset = 0x31C, type = types.u8, bounds = {0,15} },
+			unit_master_obj_id = { offset = 0x324, type = types.i16, bounds = {-1,2046} }, -- Confirmed. Object ID controlling this unit (driver)
+			unit_masterofweapons_obj_id = { offset = 0x328, type = types.i16, bounds = {-1,2046} }, -- Confirmed. Object ID controlling the weapons of this unit (gunner)
+			unit_passenger_obj_id = { offset = 0x32C, type = types.i16, bounds = {-1,2046} },
+
 			bipd = {
 				unique_id = { offset = 0x52A, type = types.u16 } -- some unused padding.
 			}
@@ -306,11 +325,24 @@ bipd_rotation_message_def = {
 
 bipd_spawn_message_def = {
 	message = {
-		{ offsets.object.color_change_a, size = 3*1, copy_from_cached_value = true },
-		{ offsets.object.unit.weapon_1_object_id, size = 3, convert_object_id_to_tag_id = true }
+		{ offsets.object.color_change_a, size = 2, copy_from_cached_value = true },
+		{ offsets.object.color_change_b, size = 2, copy_from_cached_value = true },
+		{ offsets.object.color_change_c, size = 2, copy_from_cached_value = true },
+		{ offsets.object.color_change_d, size = 2, copy_from_cached_value = true },
+
+		{ offsets.object.namelist_index, size = 2 },
+		{ offsets.object.unit.weapon_1_object_id, size = 2, convert_object_id_to_tag_id = true },
+		{ offsets.object.unit.weapon_2_object_id, size = 2, convert_object_id_to_tag_id = true },
+		{ offsets.object.unit.weapon_3_object_id, size = 2, convert_object_id_to_tag_id = true },
+		{ offsets.object.unit.weapon_4_object_id, size = 2, convert_object_id_to_tag_id = true }
+
 	},
 	action_when_recieved = {
-		{ offsets.object.unit.weapon_1_object_id, spawn_child_object_from_tag_id = true }
+		{ offsets.object.unit.weapon_1_object_id, spawn_child_object_from_tag_id = true },
+		{ offsets.object.unit.weapon_2_object_id, spawn_child_object_from_tag_id = true },
+		{ offsets.object.unit.weapon_3_object_id, spawn_child_object_from_tag_id = true },
+		{ offsets.object.unit.weapon_4_object_id, spawn_child_object_from_tag_id = true }
+
 	}
 }
 
