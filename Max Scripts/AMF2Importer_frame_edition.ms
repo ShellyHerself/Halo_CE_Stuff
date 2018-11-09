@@ -1,6 +1,8 @@
 /******************************************************************************
 AMF Importer By Gravemind2401
-Edited by GoofballMichelle to import bones as frames for convenience
+Edited by GoofballMichelle to import bones as frames for convenience.
+Nodes have the size set in the 'node radius' box.
+All nodes have the prefix "frame " added to them.
 -------------------------------------------------------------------------------
 A new format built by Gravemind2401 to cater for many, many more options 
 when importing as well as up to 85%+ smaller filesize and better shader support
