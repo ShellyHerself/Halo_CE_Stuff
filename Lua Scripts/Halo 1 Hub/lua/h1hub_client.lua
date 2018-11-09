@@ -78,9 +78,9 @@ function OnRconMessage(message)
 		
 	elseif messages[2] == "spawn_beep" then
 		if messages[3] == "spawned" then
-			execute_script("sound_impulse_start sound\\sfx\\ui\\countdown_for_respawn none 1")
-		else
 			execute_script("sound_impulse_start sound\\sfx\\ui\\player_respawn none 1")
+		else
+			execute_script("sound_impulse_start sound\\sfx\\ui\\countdown_for_respawn none 1")
 		end
 		return false
 		
