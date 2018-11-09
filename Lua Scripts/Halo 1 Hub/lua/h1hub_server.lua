@@ -2,6 +2,10 @@
 api_version = "1.9.0.0"
 
 
+-- Enable Training Mode in a match using: lua_call h1hub_server enable_training_mode
+-- Disable Training Mode in a match using: lua_call h1hub_server enable_training_mode
+
+
 -- Admin setup:
 enable_timer_functions = true
 	enable_talking_timer = true -- weapon countdowns are not implemented yet.
@@ -16,10 +20,22 @@ long_announcements = { "overshield", "camo", "rocket", "sniper", "up_next", "20(
 -- Script setup:
 script_version = 2 --DO NOT EDIT!
 
+-- You shouldn't edit these:
 tick_counter = nil
 sv_map_reset_tick = nil
 game_in_progress = false
+training_mode = false
 
+-- Callables:
+function enable_training_mode()
+	training_mode = true
+end
+
+function disable_training_mode()
+	training_mode = false
+end
+
+--
 function OnScriptLoad()
 	register_callback(cb['EVENT_GAME_START'],"OnGameStart")
 	register_callback(cb['EVENT_GAME_END'],"OnGameEnd")
@@ -40,6 +56,12 @@ end
 
 function OnJoin(player_id)
 	rprint(player_id, "|n" ..sep.. "version" ..sep .. script_version)
+	
+	if training_mode then
+		rprint(player_id, "|n" ..sep.. "training_mode" ..sep .. "true")
+	else
+		rprint(player_id, "|n" ..sep.. "training_mode" ..sep .. "false")
+	end
 end
 
 function OnGameStart()
@@ -49,12 +71,24 @@ function OnGameEnd()
 	game_in_progress = false
 end
 
-
+last_tick_training_mode = false
 function OnTick()
 	if game_in_progress == true then
 		if enable_timer_functions == true then
 			TimersOnTick()
 		end
+	end
+	
+	if training_mode == true and last_tick_training_mode == false then
+		for player_id=1,16 do
+			rprint(player_id, "|n" ..sep.. "training_mode" ..sep .. "true")
+		end
+		last_tick_training_mode = true
+	elseif training_mode == false and last_tick_training_mode == true then
+		for player_id=1,16 do
+			rprint(player_id, "|n" ..sep.. "training_mode" ..sep .. "false")
+		end
+		last_tick_training_mode = false
 	end
 end
 
