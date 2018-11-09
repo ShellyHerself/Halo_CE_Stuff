@@ -7,7 +7,8 @@ enable_timer_functions = true
 	enable_talking_timer = true -- weapon countdowns are not implemented yet.
 		enable_weapon_announcements = true -- Not implemented yet.
 	
-	enable_cutscene_title_timer = true -- Not properly implemented yet.
+	enable_cutscene_title_timer = true
+		tens_flash_in_a_different_color = true
 
 -- Announcements that require a second instead of just half a second
 long_announcements = { "overshield", "camo", "rocket", "sniper", "up_next", "20(twenny)_seconds"}
@@ -163,13 +164,29 @@ end
 function OnScreenTimerUpdate(minutes, seconds)
 	for i=1,16 do
 		ClearPlayerConsole(i)
-		--rprint(i, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds) .. "|ncin_tit")
-		CutsceneTitlePrint(i, seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0, 1, 1, 120, 117, 186, 255)
+		if tens_flash_in_a_different_color then
+			--rprint(i, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds) .. "|ncin_tit")
+			if seconds == 0 then
+			CutsceneTitlePrint(i, 2+seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0, 0.25, 0.5, 200, 255, 0, 0)
+			CutsceneTitlePrint(i, seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0.75, 1, 1, 160, 117, 186, 255)
+			
+			elseif seconds == 30 then
+			CutsceneTitlePrint(i, 2+seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0, 0.25, 0.5, 200, 0, 255, 0)
+			CutsceneTitlePrint(i, seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0.75, 1, 1, 160, 117, 186, 255)
+			
+			elseif seconds % 10 == 0 then
+			CutsceneTitlePrint(i, 2+seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0, 0.25, 0.5, 200, 255, 255, 255)
+			CutsceneTitlePrint(i, seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0.75, 1, 1, 160, 117, 186, 255)
+			
+			else
+			CutsceneTitlePrint(i, seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0, 1, 1, 160, 117, 186, 255)
+			end
+		else
+			CutsceneTitlePrint(i, seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0, 1, 1, 160, 117, 186, 255)
+		end
 		CutsceneTitleDelete(i, (seconds+1) % 2)
 	end
 end
-
-
 
 function CutsceneTitlePrint(player_id, slot, text, 
                             cutscene_title_x, cutscene_title_y,
@@ -201,8 +218,7 @@ function CutsceneTitlePrint(player_id, slot, text,
 	
 	local text = text .. "|n"..sep.."cin_tit"
 	text = text ..sep.. string.format("%02X", slot) 
-	text = text .. string.format("%03X", cutscene_title_x)
-	text = text .. string.format("%03X", cutscene_title_y)
+	text = text .. string.format("%03X", cutscene_title_x) .. string.format("%03X", cutscene_title_y)
 	text = text .. string.format("%03X", fade_in_time) .. string.format("%03X", staying_time) .. string.format("%03X", fade_out_time)
 	text = text .. string.format("%02X", alpha) .. string.format("%02X", red) .. string.format("%02X", green) .. string.format("%02X", blue)
 	

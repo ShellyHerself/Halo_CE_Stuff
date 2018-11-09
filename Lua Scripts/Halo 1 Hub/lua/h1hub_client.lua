@@ -161,10 +161,7 @@ function CutsceneTitleMessage(text, settings)
 		y = virtual_hud_bounds_y1 + y
 	end
 	
-	write_i16(cutscene_title_block_addr+96*slot+40, y)
-	write_i16(cutscene_title_block_addr+96*slot+42, virtual_hud_bounds_y2)
-	write_i16(cutscene_title_block_addr+96*slot+44, virtual_hud_bounds_x2)
-	write_i16(cutscene_title_block_addr+96*slot+46, x)
+	write_rectangle(cutscene_title_block_addr+96*slot+40, y, virtual_hud_bounds_y2, virtual_hud_bounds_x2, x)
 	
 	write_i16(cutscene_title_block_addr+96*slot+52, justification)
 	
@@ -217,6 +214,13 @@ function write_argb(address, a, r, g, b)
 	write_u8(address+2, r)
 	write_u8(address+1, g)
 	write_u8(address,   b)
+end
+
+function write_rectangle(address, t, l, b, r)
+	write_i16(address, t)
+	write_i16(address+2, l)
+	write_i16(address+4, b)
+	write_i16(address+6, r)
 end
 
 function write_nulterminated_widestring(address, str, len)
