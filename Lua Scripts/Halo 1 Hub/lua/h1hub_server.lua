@@ -69,6 +69,7 @@ function OnGameStart()
 end
 function OnGameEnd()
 	game_in_progress = false
+	training_mode = false
 end
 
 last_tick_training_mode = false
