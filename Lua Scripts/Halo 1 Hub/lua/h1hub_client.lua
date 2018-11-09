@@ -7,7 +7,7 @@ set_callback("map load", "OnMapLoad")
 set_callback("rcon message", "OnRconMessage")
 set_callback("tick", "OnTick")
 
-script_version = 2 --DO NOT EDIT!
+script_version = 3 --DO NOT EDIT!
 
 -- Announcements that require a second instead of just half a second
 long_announcements = {}
@@ -20,7 +20,20 @@ queue_rate = short_announcement_time
 
 function OnMapLoad()
 	InitCutsceneTitleMessages()
+	CheckHostStatus()
 end
+
+
+training_mode = false
+
+function CheckHostStatus()
+	if server_type == "dedicated" then
+		host = false
+	else
+		host = true
+	end
+end
+
 
 
 function OnRconMessage(message)
@@ -68,6 +81,15 @@ function OnRconMessage(message)
 			execute_script("sound_impulse_start sound\\sfx\\ui\\countdown_for_respawn none 1")
 		else
 			execute_script("sound_impulse_start sound\\sfx\\ui\\player_respawn none 1")
+		end
+		return false
+		
+	elseif messages[2] == "training_mode" then
+		if messages[3] == "true" then
+			training_mode = true
+			execute_script("object_create_anew_containing \"train\"")
+		else
+			training_mode = false
 		end
 		return false
 		
@@ -122,6 +144,10 @@ function OnTick()
 			
 			table.remove(queue, 1)
 		end
+	end
+	
+	if not host and not training_mode then
+		execute_script("object_destroy_containing \"train\"")
 	end
 end
 
