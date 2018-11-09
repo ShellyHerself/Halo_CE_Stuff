@@ -7,7 +7,7 @@ set_callback("map load", "OnMapLoad")
 set_callback("rcon message", "OnRconMessage")
 set_callback("tick", "OnTick")
 
-script_version = 1 --DO NOT EDIT!
+script_version = 2 --DO NOT EDIT!
 
 -- Announcements that require a second instead of just half a second
 long_announcements = {}
@@ -75,9 +75,11 @@ function OnRconMessage(message)
 		if tonumber(messages[3]) <= script_version then
 			cprint("Debug: Client and server scripts are compatible.", 0, 1, 0)
 			hud_message("Debug: Client and server scripts are compatible.")
+			execute_script("sound_impulse_start sound\\sfx\\ui\\countdown_timer_end none 1")
 		else
 			cprint("Debug: Server has a newer script than the client.", 1, 0, 0)
 			hud_message("Debug: Server has a newer script than the client.")
+			execute_script("sound_impulse_start sound\\sfx\\ui\\flag_failure none 1")
 		end
 		return false
 		

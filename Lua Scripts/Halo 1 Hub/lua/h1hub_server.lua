@@ -14,7 +14,7 @@ enable_timer_functions = true
 long_announcements = { "overshield", "camo", "rocket", "sniper", "up_next", "20(twenny)_seconds"}
 
 -- Script setup:
-script_version = 1 --DO NOT EDIT!
+script_version = 2 --DO NOT EDIT!
 
 tick_counter = nil
 sv_map_reset_tick = nil
