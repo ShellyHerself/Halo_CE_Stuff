@@ -63,6 +63,14 @@ function OnRconMessage(message)
 		end
 		return false
 		
+	elseif messages[2] == "spawn_beep" then
+		if messages[3] == "spawned" then
+			execute_script("sound_impulse_start sound\\sfx\\ui\\countdown_for_respawn none 1")
+		else
+			execute_script("sound_impulse_start sound\\sfx\\ui\\player_respawn none 1")
+		end
+		return false
+		
 	elseif messages[2] == "version" then
 		if tonumber(messages[3]) <= script_version then
 			cprint("Debug: Client and server scripts are compatible.", 0, 1, 0)
