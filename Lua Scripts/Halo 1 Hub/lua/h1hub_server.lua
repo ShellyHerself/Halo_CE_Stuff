@@ -13,6 +13,8 @@ enable_timer_functions = true
 	
 	enable_cutscene_title_timer = true
 		tens_flash_in_a_different_color = true
+		
+team_mate_spawn_beeps = true
 
 -- Announcements that require a second instead of just half a second
 long_announcements = { "overshield", "camo", "rocket", "sniper", "up_next", "20(twenny)_seconds"}
@@ -91,6 +93,27 @@ function OnTick()
 		end
 		last_tick_training_mode = false
 	end
+	
+	if team_mate_spawn_beeps then
+		for player_id=1,16 do
+			player = get_player(player_id)
+			if player ~= 0 then
+				local team = read_byte(player+0x20)
+				local respawn_ticks = read_dword(player+0x2C)
+				if respawn_ticks <= 90 and respawn_ticks >= 30 and respawn_ticks % 30 == 0 then
+					for i=1,16 do
+						if i ~= player_id then
+							player_i = get_player(i)
+							local team_i = read_byte(player_i+0x20)
+							if team == team_i then
+								rprint(i, "|n" ..sep.. "spawn_beep" ..sep .. "nope")
+							end
+						end
+					end
+				end
+			end
+		end
+	end
 end
 
 function OnDeath(player_id, causer) --expect second arg as string
@@ -110,7 +133,22 @@ function OnPickup(player_id, weapon_type, weapon_slot) --expect second and third
 end
 
 function OnSpawn(player_id)
-	
+	player = get_player(player_id)
+	if player ~= 0 then
+		if team_mate_spawn_beeps then
+			local team = read_byte(player+0x20)
+			
+			for i=1,16 do
+				if i ~= player_id then
+					player_i = get_player(i)
+					local team_i = read_byte(player_i+0x20)
+					if team == team_i then
+						rprint(i, "|n" ..sep.. "spawn_beep" ..sep .. "spawned")
+					end
+				end
+			end
+		end
+	end
 end
 
 --- Timer functions
