@@ -104,9 +104,11 @@ function OnTick()
 					for i=1,16 do
 						if i ~= player_id then
 							player_i = get_player(i)
-							local team_i = read_byte(player_i+0x20)
-							if team == team_i then
-								rprint(i, "|n" ..sep.. "spawn_beep" ..sep .. "nope")
+							if player_i ~= 0 then
+								local team_i = read_byte(player_i+0x20)
+								if team == team_i then
+									rprint(i, "|n" ..sep.. "spawn_beep" ..sep .. "nope")
+								end
 							end
 						end
 					end
@@ -141,9 +143,11 @@ function OnSpawn(player_id)
 			for i=1,16 do
 				if i ~= player_id then
 					player_i = get_player(i)
-					local team_i = read_byte(player_i+0x20)
-					if team == team_i then
-						rprint(i, "|n" ..sep.. "spawn_beep" ..sep .. "spawned")
+					if player_i ~= 0 then
+						local team_i = read_byte(player_i+0x20)
+						if team == team_i then
+							rprint(i, "|n" ..sep.. "spawn_beep" ..sep .. "spawned")
+						end
 					end
 				end
 			end
