@@ -192,6 +192,7 @@ function TimersOnTick()
 	ticks_passed = read_dword(tick_counter) - read_dword(sv_map_reset_tick)
 
 	if (ticks_passed % 30) == 0 then
+		sound_blocked_secs = sound_blocked_secs - 1
 		--We only want to process stuff every second
 		local time_passed = math.floor(ticks_passed / 30)
 		local minutes = math.floor(time_passed / 60) % 30 --modulus 30 so it resets after 30 minutes
