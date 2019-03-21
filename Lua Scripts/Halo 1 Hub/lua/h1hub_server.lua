@@ -8,8 +8,8 @@ api_version = "1.9.0.0"
 
 -- Admin setup:
 enable_timer_functions = true
-	enable_talking_timer = true -- weapon countdowns are not implemented yet.
-		enable_weapon_announcements = true -- Not implemented yet.
+	enable_talking_timer = true
+		enable_weapon_announcements = true
 	
 	enable_cutscene_title_timer = true
 		tens_flash_in_a_different_color = true
@@ -20,13 +20,21 @@ team_mate_spawn_beeps = true
 long_announcements = { "overshield", "camo", "rocket", "sniper", "up_next", "20(twenny)_seconds"}
 
 -- Script setup:
-script_version = 2 --DO NOT EDIT!
+script_version = 3 --DO NOT EDIT!
 
 -- You shouldn't edit these:
 tick_counter = nil
 sv_map_reset_tick = nil
 game_in_progress = false
 training_mode = false
+cutscene_titles = {}
+netgame_equipment = {}
+ROCKET_LAUNCHER = 10
+SNIPER_RIFLE = 11
+OVERSHIELD = 12
+CAMO = 13
+SHIELD_CAMO = 14
+game_type = nil
 
 -- Callables:
 function enable_training_mode()
@@ -54,6 +62,7 @@ function OnScriptLoad()
 	
 	InitializeTimers()
 	OnGameStart()
+	game_type = get_var(0, "$gt")
 end
 
 function OnJoin(player_id)
@@ -68,6 +77,8 @@ end
 
 function OnGameStart()
 	game_in_progress = true
+	GetScenarioData()
+	game_type = get_var(0, "$gt")
 end
 function OnGameEnd()
 	game_in_progress = false
@@ -175,6 +186,8 @@ function InitializeTimers()
 	sv_map_reset_tick = read_dword(sv_map_reset_tick_sig + 7)
 end
 
+sound_blocked_secs = 0
+
 function TimersOnTick()
 	ticks_passed = read_dword(tick_counter) - read_dword(sv_map_reset_tick)
 
@@ -184,8 +197,13 @@ function TimersOnTick()
 		local minutes = math.floor(time_passed / 60) % 30 --modulus 30 so it resets after 30 minutes
 		local seconds = time_passed % 60
 		
+		if enable_weapon_announcements == true then
+			WeaponAnnounce(time_passed)
+		end
 		if enable_talking_timer == true then
-			TalkingTimerAnnounce(time_passed, minutes, seconds)
+			if sound_blocked_secs < 1 then
+				TalkingTimerAnnounce(time_passed, minutes, seconds)
+			end
 		end
 		
 		if enable_cutscene_title_timer == true then
@@ -220,7 +238,7 @@ function TalkingTimerAnnounce(time_passed, minutes, seconds)
 		end
 	-- this else is because this should not be ran on the top of a minute
 	else
-	if seconds_left == 30 then
+		if seconds_left == 30 then
 			message_to_send = message_to_send .. sep .. "30_seconds_left"
 		elseif seconds_left == 20 then
 			message_to_send = message_to_send .. sep .. "20(twenny)_seconds"
@@ -235,7 +253,6 @@ function TalkingTimerAnnounce(time_passed, minutes, seconds)
 			rprint(i, message_to_send)
 		end
 	end
-
 end
 
 function OnScreenTimerUpdate(minutes, seconds)
@@ -306,6 +323,171 @@ function CutsceneTitleDelete(player_id, slot)
 	rprint(player_id, "|n" ..sep.. "cin_tit" ..sep.. "del" ..sep.. string.format("%02X", slot))
 end
 
+function GetScenarioData()
+	local scenario_ptr = read_dword(0x40440028+0x14)
+	local cutscene_flags_reflexive_offset = 1252
+	local cutscene_flag_count = read_dword(scenario_ptr+cutscene_flags_reflexive_offset)
+	local cutscene_flag_ptr = read_dword(scenario_ptr+cutscene_flags_reflexive_offset+4)
+	
+	cutscene_flags = {}
+	for i=0,cutscene_flag_count-1 do
+		local this_name = read_string(cutscene_flag_ptr+i*92+4)
+		local pos_x, pos_y, pos_z  = read_vector3d(cutscene_flag_ptr+i*92+36)
+		local this_entry = {name=this_entry, x=pos_x, y=pos_y, z=pos_z}
+		table.insert(cutscene_flags, this_entry)
+	end
+	
+	local netgame_equipment_reflexive_offset = 900
+	local equipment_count = read_dword(scenario_ptr+netgame_equipment_reflexive_offset)
+	local equipment_ptr = read_dword(scenario_ptr+netgame_equipment_reflexive_offset+4)
+	
+	local ctf_enabled    = {0}
+	local slayer_enabled = {1, 11, 12, 13}
+	local ball_enabled   = {2, 11, 12, 13}
+	local king_enabled   = {3, 11, 13, 13}
+	
+	netgame_equipment = {}
+	
+	for i=0,equipment_count-1 do
+		local ctf    = false
+		local slayer = false
+		local ball   = false
+		local king   = false
+		local spawn_time = read_word(equipment_ptr+i*144+14)
+		local pos_x, pos_y, pos_z = read_vector3d(equipment_ptr+i*144+64)
+		local equip_type = 0
+		for j=0,3 do
+			for k, v in pairs(ctf_enabled) do
+				if ctf_enabled[k] == read_word(equipment_ptr+i*144+j*2+4) then
+					ctf = true
+					break
+				end
+			end
+			for k, v in pairs(slayer_enabled) do
+				if slayer_enabled[k] == read_word(equipment_ptr+i*144+j*2+4) then
+					slayer = true
+					break
+				end
+			end
+			for k, v in pairs(ball_enabled) do
+				if ball_enabled[k] == read_word(equipment_ptr+i*144+j*2+4) then
+					ball = true
+					break
+				end
+			end
+			for k, v in pairs(king_enabled) do
+				if king_enabled[k] == read_word(equipment_ptr+i*144+j*2+4) then
+					king = true
+					break
+				end
+			end
+		end
+		local tag_path = read_string(read_dword(equipment_ptr+i*144+80+4))
+		if spawn_time == 0 then
+			spawn_time = read_word(read_dword(lookup_tag(read_dword(equipment_ptr+i*144+80+12))+0x14)+12)
+			if spawn_time == 0 then
+				spawn_time = 30
+			end
+		end
+		if ends_with(tag_path, "rocket launcher") then
+			equip_type = ROCKET_LAUNCHER
+		elseif ends_with(tag_path, "sniper rifle") then
+			equip_type = SNIPER_RIFLE
+		elseif ends_with(tag_path, "powerup super shield") then
+			equip_type = OVERSHIELD
+		elseif ends_with(tag_path, "powerup invisibility") then
+			equip_type = CAMO
+		elseif ends_with(tag_path, "shield-invisibility") then
+			equip_type = SHIELD_CAMO
+		end
+		
+		local this_entry = {}
+		this_entry.gt_ctf=ctf
+		this_entry.gt_slayer=slayer
+		this_entry.gt_ball=ball
+		this_entry.gt_king=king
+		this_entry.respawn_time=spawn_time
+		this_entry.x=pos_x
+		this_entry.y=pos_y
+		this_entry.z=pos_z
+		this_entry.equipment_type=equip_type
+		
+		table.insert(netgame_equipment, this_entry)
+		--cprint(tostring(slayer))
+	
+	end
+	
+	
+end
+
+function WeaponAnnounce(time_passed) -- actually ticks passed
+	local message_to_send = "|n"..sep.."timer"
+	
+	local rockets = false
+	local sniper = false
+	local ovie = false
+	local camo = false
+	
+	seceridos = 0
+	
+	ne = netgame_equipment
+	for k,v in pairs(ne) do
+	--cprint(ne[k].gt_slayer)
+		if ne[k].gt_slayer == true and game_type == "slayer"
+		or (ne[k].gt_ctf  == true and gametype == "ctf")
+		or (ne[k].gt_king == true and gametype == "king")
+		or (ne[k].gt_ball == true and gametype == "oddball") then
+			--cprint("somshit")
+			resp_time = ne[k].respawn_time
+			
+			if (resp_time - (time_passed % resp_time)) == 10 then
+				if ne[k].equipment_type == ROCKET_LAUNCHER then
+					if rockets == false then
+						message_to_send = message_to_send ..sep.. "rocket"
+						rockets = true
+						seceridos = seceridos + 1
+						cprint("rox")
+					end
+				end
+				if ne[k].equipment_type == SNIPER_RIFLE then
+					if sniper == false then
+						message_to_send = message_to_send ..sep.. "sniper"
+						sniper = true
+						seceridos = seceridos + 1
+					end
+				end
+				if ne[k].equipment_type == OVERSHIELD then
+					if ovie == false then
+						message_to_send = message_to_send ..sep.. "overshield"
+						ovie = true
+						seceridos = seceridos + 1
+					end
+				end
+				if ne[k].equipment_type == CAMO then
+					if camo == false then
+						message_to_send = message_to_send ..sep.. "camo"
+						camo = true
+						seceridos = seceridos + 1
+					end
+				end
+				if ne[k].equipment_type == SHIELD_CAMO then
+					message_to_send = message_to_send -- ..sep.. 
+				end
+			end
+		end
+	end
+	
+	if sound_blocked_secs < seceridos then
+		sound_blocked_secs = seceridos
+	end
+	
+	if message_to_send ~= "|n"..sep.."timer" then
+		for i=1,16 do
+			rprint(i, message_to_send)
+		end
+	end
+end
+
 function CheckValueBounds(value, low_bound, high_bound)
 	if value ~= nil then
 		if value > high_bound then
@@ -324,4 +506,12 @@ function ClearPlayerConsole(id)
 	for j=1,24 do
 		rprint(id, "|ndelete")
 	end
+end
+
+function starts_with(str, start)
+   return str:sub(1, #start) == start
+end
+
+function ends_with(str, ending)
+   return ending == "" or str:sub(-#ending) == ending
 end

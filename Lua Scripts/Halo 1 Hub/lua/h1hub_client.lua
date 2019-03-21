@@ -10,7 +10,7 @@ set_callback("tick", "OnTick")
 script_version = 3 --DO NOT EDIT!
 
 -- Announcements that require a second instead of just half a second
-long_announcements = {}
+long_announcements = { "overshield", "camo", "rocket", "sniper", "up_next", "20(twenny)_seconds"}
 long_announcement_time = 30
 short_announcement_time = 15
 
@@ -82,6 +82,10 @@ function OnRconMessage(message)
 		else
 			execute_script("sound_impulse_start sound\\sfx\\ui\\countdown_for_respawn none 1")
 		end
+		return false
+		
+	elseif messages[2] == "navpoint" then
+		-- Nothing here yet
 		return false
 		
 	elseif messages[2] == "training_mode" then
@@ -161,8 +165,11 @@ function InitCutsceneTitleMessages()
 	local scenario_ingame_help_text_reference_offset = 1412
 	cutscene_title_block_addr = read_u32(read_u32(0x40440028+0x14)+scenario_cutscene_titles_block_reflexive_offset+4)
 	local ustr_tag_id = read_u16(read_u32(0x40440028+0x14)+scenario_ingame_help_text_reference_offset+12)
-	local cutscene_title_ustr_tag_addr = read_u32(get_tag(ustr_tag_id)+0x14)
-	cutscene_title_string_block_addr = read_u32(cutscene_title_ustr_tag_addr+4)
+	local ustr_tag_entry = get_tag(ustr_tag_id)
+	if ustr_tag_entry ~= nil then
+		local cutscene_title_ustr_tag_addr = read_u32(ustr_tag_entry+0x14)
+		cutscene_title_string_block_addr = read_u32(cutscene_title_ustr_tag_addr+4)
+	end
 end
 
 virtual_hud_bounds_x1 = 0
