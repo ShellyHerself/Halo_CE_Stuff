@@ -421,7 +421,18 @@ function GetScenarioData()
 	
 end
 
-function WeaponAnnounce(time_passed) -- actually ticks passed
+function WeaponAnnounce(time_passed)
+
+
+	if time_passed % 10 == 0 then
+		for i=1,16 do
+			rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."rocket_flag"..sep..(i-1))
+			rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."sniper_flag"..sep..(i-1))
+			rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."camo_flag"..sep..(i-1))
+			rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."overshield_flag"..sep..(i-1))
+		end
+	end
+
 	local message_to_send = "|n"..sep.."timer"
 	
 	local rockets = false
@@ -447,7 +458,11 @@ function WeaponAnnounce(time_passed) -- actually ticks passed
 						message_to_send = message_to_send ..sep.. "rocket"
 						rockets = true
 						seceridos = seceridos + 1
-						cprint("rox")
+						if training_mode and game_type == "slayer" then
+							for i=1,16 do
+								rprint(i, "|n"..sep.."nav"..sep.."rocket"..sep.."rocket_flag"..sep..(i-1))
+							end
+						end
 					end
 				end
 				if ne[k].equipment_type == SNIPER_RIFLE then
@@ -455,6 +470,11 @@ function WeaponAnnounce(time_passed) -- actually ticks passed
 						message_to_send = message_to_send ..sep.. "sniper"
 						sniper = true
 						seceridos = seceridos + 1
+						if training_mode and game_type == "slayer" then
+							for i=1,16 do
+								rprint(i, "|n"..sep.."nav"..sep.."sniper"..sep.."sniper_flag"..sep..(i-1))
+							end
+						end
 					end
 				end
 				if ne[k].equipment_type == OVERSHIELD then
@@ -462,6 +482,11 @@ function WeaponAnnounce(time_passed) -- actually ticks passed
 						message_to_send = message_to_send ..sep.. "overshield"
 						ovie = true
 						seceridos = seceridos + 1
+						if training_mode and game_type == "slayer" then
+							for i=1,16 do
+								rprint(i, "|n"..sep.."nav"..sep.."overshield"..sep.."overshield_flag"..sep..(i-1))
+							end
+						end
 					end
 				end
 				if ne[k].equipment_type == CAMO then
@@ -469,6 +494,11 @@ function WeaponAnnounce(time_passed) -- actually ticks passed
 						message_to_send = message_to_send ..sep.. "camo"
 						camo = true
 						seceridos = seceridos + 1
+						if training_mode and game_type == "slayer" then
+							for i=1,16 do
+								rprint(i, "|n"..sep.."nav"..sep.."camo"..sep.."camo_flag"..sep..(i-1))
+							end
+						end
 					end
 				end
 				if ne[k].equipment_type == SHIELD_CAMO then

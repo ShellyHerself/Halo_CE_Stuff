@@ -84,8 +84,13 @@ function OnRconMessage(message)
 		end
 		return false
 		
-	elseif messages[2] == "navpoint" then
-		-- Nothing here yet
+	elseif messages[2] == "nav" then
+		if messages[3] ~= "del" then
+			execute_script("activate_nav_point_flag \""..messages[3].."\" (unit (list_get (players)"..messages[5]..")) \""..messages[4].."\" 0.7")
+			--cprint("activate_nav_point_flag \""..messages[3].."\" (unit (list_get (players)"..messages[5]..")) \""..messages[4].."\" 0.7")
+		else
+			execute_script("deactivate_nav_point_flag (unit (list_get (players)"..messages[5]..")) \""..messages[4].."\"")
+		end
 		return false
 		
 	elseif messages[2] == "training_mode" then
