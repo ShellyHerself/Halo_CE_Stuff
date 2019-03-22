@@ -2,8 +2,8 @@
 api_version = "1.9.0.0"
 
 
--- Enable Training Mode in a match using: lua_call h1hub_server enable_training_mode
--- Disable Training Mode in a match using: lua_call h1hub_server enable_training_mode
+-- Enable Training Mode in a match using:  lua_call h1hub_server enable_training_mode
+-- Disable Training Mode in a match using: lua_call h1hub_server disable_training_mode
 
 
 -- Admin setup:
