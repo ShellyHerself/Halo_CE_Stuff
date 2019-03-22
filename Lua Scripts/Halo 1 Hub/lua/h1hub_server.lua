@@ -453,64 +453,64 @@ function WeaponAnnounce(time_passed)
 		or (ne[k].gt_ctf  == true and gametype == "ctf")
 		or (ne[k].gt_king == true and gametype == "king")
 		or (ne[k].gt_ball == true and gametype == "oddball") then
-			--cprint("somshit")
 			resp_time = ne[k].respawn_time
-			
 			if (resp_time - (time_passed % resp_time)) == 10 then
 				if ne[k].equipment_type == ROCKET_LAUNCHER then
 					if rockets == false and enable_rocket_announcement == true then
-						message_to_send = message_to_send ..sep.. "rocket"
 						rockets = true
-						seceridos = seceridos + 1
-						if training_mode and game_type == "slayer" then
-							for i=1,16 do
-								rprint(i, "|n"..sep.."nav"..sep.."rocket"..sep.."rocket_flag"..sep..(i-1))
-							end
-						end
 					end
 				end
 				if ne[k].equipment_type == SNIPER_RIFLE then
 					if sniper == false and enable_sniper_announcement == true then
-						message_to_send = message_to_send ..sep.. "sniper"
 						sniper = true
-						seceridos = seceridos + 1
-						if training_mode and game_type == "slayer" then
-							for i=1,16 do
-								rprint(i, "|n"..sep.."nav"..sep.."sniper"..sep.."sniper_flag"..sep..(i-1))
-							end
-						end
 					end
 				end
 				if ne[k].equipment_type == OVERSHIELD or ne[k].equipment_type == SHIELD_CAMO then
 					if ovie == false and enable_os_announcement == true then
-						message_to_send = message_to_send ..sep.. "overshield"
 						ovie = true
-						seceridos = seceridos + 1
-						if training_mode and game_type == "slayer" then
-							for i=1,16 do
-								rprint(i, "|n"..sep.."nav"..sep.."overshield"..sep.."overshield_flag"..sep..(i-1))
-							end
-						end
 					end
 				end
 				if ne[k].equipment_type == CAMO then
 					if camo == false and enable_camo_announcement == true then
-						message_to_send = message_to_send ..sep.. "camo"
 						camo = true
-						seceridos = seceridos + 1
-						if training_mode and game_type == "slayer" then
-							for i=1,16 do
-								rprint(i, "|n"..sep.."nav"..sep.."camo"..sep.."camo_flag"..sep..(i-1))
-							end
-						end
 					end
 				end
-				--[[if ne[k].equipment_type == SHIELD_CAMO then
-					message_to_send = message_to_send -- ..sep.. 
-				end--]]
 			end
 		end
 	end
+	
+	if rockets then
+		message_to_send = message_to_send ..sep.. "rocket"
+		seceridos = seceridos + 1
+	end
+	if camo then
+		message_to_send = message_to_send ..sep.. "camo"
+		seceridos = seceridos + 1
+	end
+	if ovie then
+		message_to_send = message_to_send ..sep.. "overshield"
+		seceridos = seceridos + 1
+	end
+	if sniper then
+		message_to_send = message_to_send ..sep.. "sniper"
+		seceridos = seceridos + 1
+	end
+	
+	if training_mode and game_type == "slayer" then
+		if rockets then
+			for i=1,16 do rprint(i, "|n"..sep.."nav"..sep.."rocket"..sep.."rocket_flag"..sep..(i-1)) end
+		end
+		if camo then
+			for i=1,16 do rprint(i, "|n"..sep.."nav"..sep.."camo"..sep.."camo_flag"..sep..(i-1)) end
+		end
+		if ovie then
+			for i=1,16 do rprint(i, "|n"..sep.."nav"..sep.."overshield"..sep.."overshield_flag"..sep..(i-1)) end
+		end
+		if sniper then
+			for i=1,16 do rprint(i, "|n"..sep.."nav"..sep.."sniper"..sep.."sniper_flag"..sep..(i-1)) end
+		end
+	end
+	
 	
 	if sound_blocked_secs < seceridos then
 		sound_blocked_secs = seceridos
