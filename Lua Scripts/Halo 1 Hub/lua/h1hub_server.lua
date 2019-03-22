@@ -10,6 +10,10 @@ api_version = "1.9.0.0"
 enable_timer_functions = true
 	enable_talking_timer = true
 		enable_weapon_announcements = true
+			enable_rocket_announcement = true
+			enable_os_announcement     = true
+			enable_camo_announcement   = true
+			enable_sniper_announcement = false
 	
 	enable_cutscene_title_timer = true
 		tens_flash_in_a_different_color = true
@@ -454,7 +458,7 @@ function WeaponAnnounce(time_passed)
 			
 			if (resp_time - (time_passed % resp_time)) == 10 then
 				if ne[k].equipment_type == ROCKET_LAUNCHER then
-					if rockets == false then
+					if rockets == false and enable_rocket_announcement == true then
 						message_to_send = message_to_send ..sep.. "rocket"
 						rockets = true
 						seceridos = seceridos + 1
@@ -466,7 +470,7 @@ function WeaponAnnounce(time_passed)
 					end
 				end
 				if ne[k].equipment_type == SNIPER_RIFLE then
-					if sniper == false then
+					if sniper == false and enable_sniper_announcement == true then
 						message_to_send = message_to_send ..sep.. "sniper"
 						sniper = true
 						seceridos = seceridos + 1
@@ -477,8 +481,8 @@ function WeaponAnnounce(time_passed)
 						end
 					end
 				end
-				if ne[k].equipment_type == OVERSHIELD then
-					if ovie == false then
+				if ne[k].equipment_type == OVERSHIELD or ne[k].equipment_type == SHIELD_CAMO then
+					if ovie == false and enable_os_announcement == true then
 						message_to_send = message_to_send ..sep.. "overshield"
 						ovie = true
 						seceridos = seceridos + 1
@@ -490,7 +494,7 @@ function WeaponAnnounce(time_passed)
 					end
 				end
 				if ne[k].equipment_type == CAMO then
-					if camo == false then
+					if camo == false and enable_camo_announcement == true then
 						message_to_send = message_to_send ..sep.. "camo"
 						camo = true
 						seceridos = seceridos + 1
@@ -501,9 +505,9 @@ function WeaponAnnounce(time_passed)
 						end
 					end
 				end
-				if ne[k].equipment_type == SHIELD_CAMO then
+				--[[if ne[k].equipment_type == SHIELD_CAMO then
 					message_to_send = message_to_send -- ..sep.. 
-				end
+				end--]]
 			end
 		end
 	end
