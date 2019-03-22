@@ -24,7 +24,7 @@ team_mate_spawn_beeps = true
 long_announcements = { "overshield", "camo", "rocket", "sniper", "up_next", "20(twenny)_seconds"}
 
 -- Script setup:
-script_version = 3 --DO NOT EDIT!
+script_version = 4 --DO NOT EDIT!
 
 -- You shouldn't edit these:
 tick_counter = nil
@@ -418,16 +418,10 @@ function GetScenarioData()
 		this_entry.equipment_type=equip_type
 		
 		table.insert(netgame_equipment, this_entry)
-		--cprint(tostring(slayer))
-	
 	end
-	
-	
 end
 
 function WeaponAnnounce(time_passed)
-
-
 	if time_passed % 10 == 0 then
 		for i=1,16 do
 			rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."rocket_flag"..sep..(i-1))
@@ -448,7 +442,6 @@ function WeaponAnnounce(time_passed)
 	
 	ne = netgame_equipment
 	for k,v in pairs(ne) do
-	--cprint(ne[k].gt_slayer)
 		if ne[k].gt_slayer == true and game_type == "slayer"
 		or (ne[k].gt_ctf  == true and gametype == "ctf")
 		or (ne[k].gt_king == true and gametype == "king")
@@ -510,7 +503,6 @@ function WeaponAnnounce(time_passed)
 			for i=1,16 do rprint(i, "|n"..sep.."nav"..sep.."sniper"..sep.."sniper_flag"..sep..(i-1)) end
 		end
 	end
-	
 	
 	if sound_blocked_secs < seceridos then
 		sound_blocked_secs = seceridos

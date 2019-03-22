@@ -7,7 +7,7 @@ set_callback("map load", "OnMapLoad")
 set_callback("rcon message", "OnRconMessage")
 set_callback("tick", "OnTick")
 
-script_version = 3 --DO NOT EDIT!
+script_version = 4 --DO NOT EDIT!
 
 -- Announcements that require a second instead of just half a second
 long_announcements = { "overshield", "camo", "rocket", "sniper", "up_next", "20(twenny)_seconds"}
