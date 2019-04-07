@@ -30,7 +30,7 @@ end
 function OnDeath(betrayer)
 	if get_player(betrayer) ~= 0 then
 		respawn_time = read_dword(get_player(betrayer)+0x2C) - betrayed_someone[betrayer]*read_word(betrayal_penalty_time_ptr)
-		if respawn_time < 3 then respawn_time = 90 end
+		if respawn_time < 90 then respawn_time = 90 end
 		write_dword(get_player(betrayer)+0x2C, respawn_time)
 		betrayed_someone[betrayer] = 0
 	end
