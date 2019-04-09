@@ -346,10 +346,10 @@ function GetScenarioData()
 	local equipment_count = read_dword(scenario_ptr+netgame_equipment_reflexive_offset)
 	local equipment_ptr = read_dword(scenario_ptr+netgame_equipment_reflexive_offset+4)
 	
-	local ctf_enabled    = {0}
-	local slayer_enabled = {1, 11, 12, 13}
-	local ball_enabled   = {2, 11, 12, 13}
-	local king_enabled   = {3, 11, 13, 13}
+	local ctf_enabled    = {1}
+	local slayer_enabled = {2, 12, 13, 14}
+	local ball_enabled   = {3, 12, 13, 14}
+	local king_enabled   = {4, 12, 13, 14}
 	
 	netgame_equipment = {}
 	
