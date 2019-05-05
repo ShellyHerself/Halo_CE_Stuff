@@ -173,6 +173,7 @@ end
 --- Timer functions
 
 ticks_passed = 0
+count_down_seconds = 0
 
 function InitializeTimers()
 	local tick_counter_sig = sig_scan("8B2D????????807D0000C644240600")
@@ -196,6 +197,10 @@ function TimersOnTick()
 	ticks_passed = read_dword(tick_counter) - read_dword(sv_map_reset_tick)
 
 	if (ticks_passed % 30) == 0 then
+		if (count_down_seconds > 0) then
+			count_down_seconds = count_down_seconds - 1
+		end
+	
 		sound_blocked_secs = sound_blocked_secs - 1
 		--We only want to process stuff every second
 		local time_passed = math.floor(ticks_passed / 30)
@@ -243,7 +248,9 @@ function TalkingTimerAnnounce(time_passed, minutes, seconds)
 		end
 	-- this else is because this should not be ran on the top of a minute
 	else
-		if seconds_left == 30 then
+		if count_down_seconds > 0 and count_down_seconds <= 10 then
+			message_to_send = message_to_send .. sep .. count_down_seconds
+		elseif seconds_left == 30 then
 			message_to_send = message_to_send .. sep .. "30_seconds_left"
 		elseif seconds_left == 20 then
 			message_to_send = message_to_send .. sep .. "20(twenny)_seconds"
@@ -447,7 +454,8 @@ function WeaponAnnounce(time_passed)
 		or (ne[k].gt_king == true and gametype == "king")
 		or (ne[k].gt_ball == true and gametype == "oddball") then
 			resp_time = ne[k].respawn_time
-			if (resp_time - (time_passed % resp_time)) == 10 then
+			time_till_resp = resp_time - (time_passed % resp_time)
+			if time_till_resp == 10 then
 				if ne[k].equipment_type == ROCKET_LAUNCHER then
 					if rockets == false and enable_rocket_announcement == true then
 						rockets = true
@@ -466,6 +474,27 @@ function WeaponAnnounce(time_passed)
 				if ne[k].equipment_type == CAMO then
 					if camo == false and enable_camo_announcement == true then
 						camo = true
+					end
+				end
+			elseif time_till_resp == 5 then
+				if ne[k].equipment_type == ROCKET_LAUNCHER then
+					if enable_rocket_announcement == true then
+						count_down_seconds = 5
+					end
+				end
+				if ne[k].equipment_type == SNIPER_RIFLE then
+					if enable_sniper_announcement == true then
+						count_down_seconds = 5
+					end
+				end
+				if ne[k].equipment_type == OVERSHIELD or ne[k].equipment_type == SHIELD_CAMO then
+					if enable_os_announcement == true then
+						count_down_seconds = 5
+					end
+				end
+				if ne[k].equipment_type == CAMO then
+					if enable_camo_announcement == true then
+						count_down_seconds = 5
 					end
 				end
 			end
