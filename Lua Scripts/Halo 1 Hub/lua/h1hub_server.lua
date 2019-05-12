@@ -456,45 +456,62 @@ function WeaponAnnounce(time_passed)
 			resp_time = ne[k].respawn_time
 			time_till_resp = resp_time - (time_passed % resp_time)
 			if time_till_resp == 10 then
-				if ne[k].equipment_type == ROCKET_LAUNCHER then
-					if rockets == false and enable_rocket_announcement == true then
-						rockets = true
+				if time_passed % 60 == 50 then
+					if ne[k].equipment_type == ROCKET_LAUNCHER then
+						if rockets == false and enable_rocket_announcement == true then
+							rockets = true
+						end
+					end
+					if ne[k].equipment_type == SNIPER_RIFLE then
+						if sniper == false and enable_sniper_announcement == true then
+							sniper = true
+						end
+					end
+					if ne[k].equipment_type == OVERSHIELD or ne[k].equipment_type == SHIELD_CAMO then
+						if ovie == false and enable_os_announcement == true then
+							ovie = true
+						end
+					end
+					if ne[k].equipment_type == CAMO then
+						if camo == false and enable_camo_announcement == true then
+							camo = true
+						end
 					end
 				end
-				if ne[k].equipment_type == SNIPER_RIFLE then
-					if sniper == false and enable_sniper_announcement == true then
-						sniper = true
+			end
+			if time_till_resp == 5 then
+				if time_passed % 60 ~= 55 then
+					if ne[k].equipment_type == ROCKET_LAUNCHER then
+						if enable_rocket_announcement == true then
+							if (resp_time % 0 ~= 0) then
+								rockets = true
+							end
+							count_down_seconds = 5
+						end
 					end
-				end
-				if ne[k].equipment_type == OVERSHIELD or ne[k].equipment_type == SHIELD_CAMO then
-					if ovie == false and enable_os_announcement == true then
-						ovie = true
+					if ne[k].equipment_type == SNIPER_RIFLE then
+						if enable_sniper_announcement == true then
+							if (resp_time % 0 ~= 0) then
+								sniper = true
+							end
+							count_down_seconds = 5
+						end
 					end
-				end
-				if ne[k].equipment_type == CAMO then
-					if camo == false and enable_camo_announcement == true then
-						camo = true
+					if ne[k].equipment_type == OVERSHIELD or ne[k].equipment_type == SHIELD_CAMO then
+						if enable_os_announcement == true then
+							if (resp_time % 0 ~= 0) then
+								ovie = true
+							end
+							count_down_seconds = 5
+						end
 					end
-				end
-			elseif time_till_resp == 5 then
-				if ne[k].equipment_type == ROCKET_LAUNCHER then
-					if enable_rocket_announcement == true then
-						count_down_seconds = 5
-					end
-				end
-				if ne[k].equipment_type == SNIPER_RIFLE then
-					if enable_sniper_announcement == true then
-						count_down_seconds = 5
-					end
-				end
-				if ne[k].equipment_type == OVERSHIELD or ne[k].equipment_type == SHIELD_CAMO then
-					if enable_os_announcement == true then
-						count_down_seconds = 5
-					end
-				end
-				if ne[k].equipment_type == CAMO then
-					if enable_camo_announcement == true then
-						count_down_seconds = 5
+					if ne[k].equipment_type == CAMO then
+						if enable_camo_announcement == true then
+							if (resp_time % 0 ~= 0) then
+								camo = true
+							end
+							count_down_seconds = 5
+						end
 					end
 				end
 			end
