@@ -435,7 +435,7 @@ function NextNavpointQueueItem()
 	if navpoint_queue[1] ~= nil then
 		for i=1,table.getn(navpoint_queue[1]) do
 			for j=1,16 do
-				rprint(j, navpoint_queue[1][i])
+				rprint(j, navpoint_queue[1][i] .. (j-1))
 			end
 		end
 		table.remove(navpoint_queue, 1)
@@ -572,30 +572,30 @@ function WeaponAnnounce(time_passed)
 		sniper_queue = {}
 		for i=0,rockets-1 do
 			if i==0 then
-				table.insert(rox_queue, "|n"..sep.."nav"..sep.."rocket"..sep.."rocket_flag"..sep..(i-1))
+				table.insert(rox_queue, "|n"..sep.."nav"..sep.."rocket"..sep.."rocket_flag"..sep)
 			else
-				table.insert(rox_queue, "|n"..sep.."nav"..sep.."rocket"..sep.."rocket_flag"..(i+1)..sep..(i-1))
+				table.insert(rox_queue, "|n"..sep.."nav"..sep.."rocket"..sep.."rocket_flag"..(i+1)..sep)
 			end
 		end
 		for i=0,camo-1 do
 			if i==0 then
-				table.insert(camo_queue, "|n"..sep.."nav"..sep.."camo"..sep.."camo_flag"..sep..(i-1))
+				table.insert(camo_queue, "|n"..sep.."nav"..sep.."camo"..sep.."camo_flag"..sep)
 			else
-				table.insert(camo_queue, "|n"..sep.."nav"..sep.."camo"..sep.."camo_flag"..(i+1)..sep..(i-1))
+				table.insert(camo_queue, "|n"..sep.."nav"..sep.."camo"..sep.."camo_flag"..(i+1)..sep)
 			end
 		end
 		for i=0,(ovie+combo-1) do
 			if i==0 then
-				table.insert(ovie_queue, "|n"..sep.."nav"..sep.."overshield"..sep.."overshield_flag"..sep..(i-1))
+				table.insert(ovie_queue, "|n"..sep.."nav"..sep.."overshield"..sep.."overshield_flag"..sep)
 			else
-				table.insert(ovie_queue, "|n"..sep.."nav"..sep.."overshield"..sep.."overshield_flag"..(i+1)..sep..(i-1))
+				table.insert(ovie_queue, "|n"..sep.."nav"..sep.."overshield"..sep.."overshield_flag"..(i+1)..sep)
 			end
 		end
 		for i=0,sniper-1 do
 			if i==0 then
-				table.insert(sniper_queue, "|n"..sep.."nav"..sep.."sniper"..sep.."sniper_flag"..sep..(i-1))
+				table.insert(sniper_queue, "|n"..sep.."nav"..sep.."sniper"..sep.."sniper_flag"..sep)
 			else
-				table.insert(sniper_queue, "|n"..sep.."nav"..sep.."sniper"..sep.."sniper_flag"..(i+1)..sep..(i-1))
+				table.insert(sniper_queue, "|n"..sep.."nav"..sep.."sniper"..sep.."sniper_flag"..(i+1)..sep)
 			end
 		end
 		
