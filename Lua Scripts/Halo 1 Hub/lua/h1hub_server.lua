@@ -442,13 +442,43 @@ function NextNavpointQueueItem()
 	end
 end
 
+hell_rockets = 0
+hell_sniper = 0
+hell_ovie = 0
+hell_camo = 0
+hell_combo = 0
+
 function WeaponAnnounce(time_passed)
-	if time_passed % 10 == 0 then
+	if time_passed % 60 ~= 55 and time_passed % 5 == 0 then
 		for i=1,16 do
-			rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."rocket_flag"..sep..(i-1))
-			rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."sniper_flag"..sep..(i-1))
-			rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."camo_flag"..sep..(i-1))
-			rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."overshield_flag"..sep..(i-1))
+			for j=1,hell_rockets do
+				if j == 1 then
+					rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."rocket_flag"..sep..(i-1))
+				else
+					rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."rocket_flag"..j..sep..(i-1))
+				end
+			end
+			for j=1,hell_sniper do
+				if j == 1 then
+					rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."sniper_flag"..sep..(i-1))
+				else
+					rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."sniper_flag"..j..sep..(i-1))
+				end
+			end
+			for j=1,hell_camo do
+				if j == 1 then
+					rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."camo_flag"..sep..(i-1))
+				else
+					rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."camo_flag"..j..sep..(i-1))
+				end
+			end
+			for j=1,hell_ovie+hell_combo do
+				if j == 1 then
+					rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."overshield_flag"..sep..(i-1))
+				else
+					rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."overshield_flag"..j..sep..(i-1))
+				end
+			end
 		end
 	end
 
@@ -614,6 +644,13 @@ function WeaponAnnounce(time_passed)
 			rprint(i, message_to_send)
 		end
 	end
+	
+	-- Yes, I know this isn't the right way to do this, but you know... feature creep.
+	hell_rockets = hell_rockets + rockets
+	hell_sniper = hell_sniper + sniper
+	hell_ovie = hell_ovie + ovie
+	hell_camo = hell_camo + camo
+	hell_combo = hell_combo + combo
 end
 
 function CheckValueBounds(value, low_bound, high_bound)
