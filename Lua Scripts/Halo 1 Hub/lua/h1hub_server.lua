@@ -433,8 +433,10 @@ navpoint_queue = {}
 
 function NextNavpointQueueItem()
 	if navpoint_queue[1] ~= nil then
-		for i=1,16 do
-			rprint(i, navpoint_queue[1])
+		for i=1,table.getn(navpoint_queue[1]) do
+			for j=1,16 do
+				rprint(j, navpoint_queue[1][i])
+			end
 		end
 		table.remove(navpoint_queue, 1)
 	end
@@ -543,20 +545,19 @@ function WeaponAnnounce(time_passed)
 			end
 		end
 	end
-	-- I don't think I really understand lua
-	for i=0,rockets-1 do
+	if rockets>0 then
 		message_to_send = message_to_send ..sep.. "rocket"
 		seceridos = seceridos + 1
 	end
-	for i=0,camo-1 do
+	if camo>0 then
 		message_to_send = message_to_send ..sep.. "camo"
 		seceridos = seceridos + 1
 	end
-	for i=0,(ovie+combo-1) do
+	if (ovie+combo)>0 then
 		message_to_send = message_to_send ..sep.. "overshield"
 		seceridos = seceridos + 1
 	end
-	for i=0,sniper-1 do
+	if sniper>0 then
 		message_to_send = message_to_send ..sep.. "sniper"
 		seceridos = seceridos + 1
 	end
@@ -565,34 +566,43 @@ function WeaponAnnounce(time_passed)
 	local flag_delay = 1
 	
 	if training_mode and game_type == "slayer" then
+		rox_queue = {}
+		camo_queue = {}
+		ovie_queue = {}
+		sniper_queue = {}
 		for i=0,rockets-1 do
 			if i==0 then
-				table.insert(navpoint_queue, "|n"..sep.."nav"..sep.."rocket"..sep.."rocket_flag"..sep..(i-1))
+				table.insert(rox_queue, "|n"..sep.."nav"..sep.."rocket"..sep.."rocket_flag"..sep..(i-1))
 			else
-				table.insert(navpoint_queue, "|n"..sep.."nav"..sep.."rocket"..sep.."rocket_flag"..(i+1)..sep..(i-1))
+				table.insert(rox_queue, "|n"..sep.."nav"..sep.."rocket"..sep.."rocket_flag"..(i+1)..sep..(i-1))
 			end
 		end
 		for i=0,camo-1 do
 			if i==0 then
-				table.insert(navpoint_queue, "|n"..sep.."nav"..sep.."camo"..sep.."camo_flag"..sep..(i-1))
+				table.insert(camo_queue, "|n"..sep.."nav"..sep.."camo"..sep.."camo_flag"..sep..(i-1))
 			else
-				table.insert(navpoint_queue, "|n"..sep.."nav"..sep.."camo"..sep.."camo_flag"..(i+1)..sep..(i-1))
+				table.insert(camo_queue, "|n"..sep.."nav"..sep.."camo"..sep.."camo_flag"..(i+1)..sep..(i-1))
 			end
 		end
 		for i=0,(ovie+combo-1) do
 			if i==0 then
-				table.insert(navpoint_queue, "|n"..sep.."nav"..sep.."overshield"..sep.."overshield_flag"..sep..(i-1))
+				table.insert(ovie_queue, "|n"..sep.."nav"..sep.."overshield"..sep.."overshield_flag"..sep..(i-1))
 			else
-				table.insert(navpoint_queue, "|n"..sep.."nav"..sep.."overshield"..sep.."overshield_flag"..(i+1)..sep..(i-1))
+				table.insert(ovie_queue, "|n"..sep.."nav"..sep.."overshield"..sep.."overshield_flag"..(i+1)..sep..(i-1))
 			end
 		end
 		for i=0,sniper-1 do
 			if i==0 then
-				table.insert(navpoint_queue, "|n"..sep.."nav"..sep.."sniper"..sep.."sniper_flag"..sep..(i-1))
+				table.insert(sniper_queue, "|n"..sep.."nav"..sep.."sniper"..sep.."sniper_flag"..sep..(i-1))
 			else
-				table.insert(navpoint_queue, "|n"..sep.."nav"..sep.."sniper"..sep.."sniper_flag"..(i+1)..sep..(i-1))
+				table.insert(sniper_queue, "|n"..sep.."nav"..sep.."sniper"..sep.."sniper_flag"..(i+1)..sep..(i-1))
 			end
-		end	
+		end
+		
+		if table.getn(rox_queue) > 0 then table.insert(navpoint_queue, rox_queue) end
+		if table.getn(camo_queue) > 0 then table.insert(navpoint_queue, camo_queue) end
+		if table.getn(ovie_queue) > 0 then table.insert(navpoint_queue, ovie_queue) end
+		if table.getn(sniper_queue) > 0 then table.insert(navpoint_queue, sniper_queue) end
 	end
 	
 	if sound_blocked_secs < seceridos then
