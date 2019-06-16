@@ -209,6 +209,7 @@ function TimersOnTick()
 		
 		if enable_weapon_announcements == true then
 			WeaponAnnounce(time_passed)
+			NextNavpointQueueItem()
 		end
 		if enable_talking_timer == true then
 			if sound_blocked_secs < 1 then
@@ -428,6 +429,17 @@ function GetScenarioData()
 	end
 end
 
+navpoint_queue = {}
+
+function NextNavpointQueueItem()
+	if navpoint_queue[1] ~= nil then
+		for i=1,16 do
+			rprint(i, navpoint_queue[1])
+		end
+		table.remove(navpoint_queue, 1)
+	end
+end
+
 function WeaponAnnounce(time_passed)
 	if time_passed % 10 == 0 then
 		for i=1,16 do
@@ -440,10 +452,11 @@ function WeaponAnnounce(time_passed)
 
 	local message_to_send = "|n"..sep.."timer"
 	
-	local rockets = false
-	local sniper = false
-	local ovie = false
-	local camo = false
+	local rockets = 0
+	local sniper = 0
+	local ovie = 0
+	local camo = 0
+	local combo = 0
 	
 	seceridos = 0
 	
@@ -458,23 +471,28 @@ function WeaponAnnounce(time_passed)
 			if time_till_resp == 10 then
 				if time_passed % 60 == 50 then
 					if ne[k].equipment_type == ROCKET_LAUNCHER then
-						if rockets == false and enable_rocket_announcement == true then
-							rockets = true
+						if enable_rocket_announcement == true then
+							rockets = rockets + 1
 						end
 					end
 					if ne[k].equipment_type == SNIPER_RIFLE then
-						if sniper == false and enable_sniper_announcement == true then
-							sniper = true
+						if enable_sniper_announcement == true then
+							sniper = sniper + 1
 						end
 					end
-					if ne[k].equipment_type == OVERSHIELD or ne[k].equipment_type == SHIELD_CAMO then
-						if ovie == false and enable_os_announcement == true then
-							ovie = true
+					if ne[k].equipment_type == OVERSHIELD then
+						if enable_os_announcement == true then
+							ovie = ovie + 1
+						end
+					end
+					if ne[k].equipment_type == SHIELD_CAMO then
+						if enable_os_announcement == true then
+							combo = combo + 1
 						end
 					end
 					if ne[k].equipment_type == CAMO then
-						if camo == false and enable_camo_announcement == true then
-							camo = true
+						if enable_camo_announcement == true then
+							camo = camo + 1
 						end
 					end
 				end
@@ -484,7 +502,7 @@ function WeaponAnnounce(time_passed)
 					if ne[k].equipment_type == ROCKET_LAUNCHER then
 						if enable_rocket_announcement == true then
 							if (resp_time % 0 ~= 0) then
-								rockets = true
+								rockets = rockets + 1
 							end
 							count_down_seconds = 5
 						end
@@ -492,15 +510,15 @@ function WeaponAnnounce(time_passed)
 					if ne[k].equipment_type == SNIPER_RIFLE then
 						if enable_sniper_announcement == true then
 							if (resp_time % 0 ~= 0) then
-								sniper = true
+								sniper = sniper + 1
 							end
 							count_down_seconds = 5
 						end
 					end
-					if ne[k].equipment_type == OVERSHIELD or ne[k].equipment_type == SHIELD_CAMO then
+					if ne[k].equipment_type == OVERSHIELD then
 						if enable_os_announcement == true then
 							if (resp_time % 0 ~= 0) then
-								ovie = true
+								ovie = ovie + 1
 							end
 							count_down_seconds = 5
 						end
@@ -508,7 +526,15 @@ function WeaponAnnounce(time_passed)
 					if ne[k].equipment_type == CAMO then
 						if enable_camo_announcement == true then
 							if (resp_time % 0 ~= 0) then
-								camo = true
+								camo = camo + 1
+							end
+							count_down_seconds = 5
+						end
+					end
+					if ne[k].equipment_type == SHIELD_CAMO then
+						if enable_camo_announcement == true then
+							if (resp_time % 0 ~= 0) then
+								combo = combo + 1
 							end
 							count_down_seconds = 5
 						end
@@ -517,37 +543,56 @@ function WeaponAnnounce(time_passed)
 			end
 		end
 	end
-	
-	if rockets then
+	-- I don't think I really understand lua
+	for i=0,rockets-1 do
 		message_to_send = message_to_send ..sep.. "rocket"
 		seceridos = seceridos + 1
 	end
-	if camo then
+	for i=0,camo-1 do
 		message_to_send = message_to_send ..sep.. "camo"
 		seceridos = seceridos + 1
 	end
-	if ovie then
+	for i=0,(ovie+combo-1) do
 		message_to_send = message_to_send ..sep.. "overshield"
 		seceridos = seceridos + 1
 	end
-	if sniper then
+	for i=0,sniper-1 do
 		message_to_send = message_to_send ..sep.. "sniper"
 		seceridos = seceridos + 1
 	end
+
+	
+	local flag_delay = 1
 	
 	if training_mode and game_type == "slayer" then
-		if rockets then
-			for i=1,16 do rprint(i, "|n"..sep.."nav"..sep.."rocket"..sep.."rocket_flag"..sep..(i-1)) end
+		for i=0,rockets-1 do
+			if i==0 then
+				table.insert(navpoint_queue, "|n"..sep.."nav"..sep.."rocket"..sep.."rocket_flag"..sep..(i-1))
+			else
+				table.insert(navpoint_queue, "|n"..sep.."nav"..sep.."rocket"..sep.."rocket_flag"..(i+1)..sep..(i-1))
+			end
 		end
-		if camo then
-			for i=1,16 do rprint(i, "|n"..sep.."nav"..sep.."camo"..sep.."camo_flag"..sep..(i-1)) end
+		for i=0,camo-1 do
+			if i==0 then
+				table.insert(navpoint_queue, "|n"..sep.."nav"..sep.."camo"..sep.."camo_flag"..sep..(i-1))
+			else
+				table.insert(navpoint_queue, "|n"..sep.."nav"..sep.."camo"..sep.."camo_flag"..(i+1)..sep..(i-1))
+			end
 		end
-		if ovie then
-			for i=1,16 do rprint(i, "|n"..sep.."nav"..sep.."overshield"..sep.."overshield_flag"..sep..(i-1)) end
+		for i=0,(ovie+combo-1) do
+			if i==0 then
+				table.insert(navpoint_queue, "|n"..sep.."nav"..sep.."overshield"..sep.."overshield_flag"..sep..(i-1))
+			else
+				table.insert(navpoint_queue, "|n"..sep.."nav"..sep.."overshield"..sep.."overshield_flag"..(i+1)..sep..(i-1))
+			end
 		end
-		if sniper then
-			for i=1,16 do rprint(i, "|n"..sep.."nav"..sep.."sniper"..sep.."sniper_flag"..sep..(i-1)) end
-		end
+		for i=0,sniper-1 do
+			if i==0 then
+				table.insert(navpoint_queue, "|n"..sep.."nav"..sep.."sniper"..sep.."sniper_flag"..sep..(i-1))
+			else
+				table.insert(navpoint_queue, "|n"..sep.."nav"..sep.."sniper"..sep.."sniper_flag"..(i+1)..sep..(i-1))
+			end
+		end	
 	end
 	
 	if sound_blocked_secs < seceridos then
