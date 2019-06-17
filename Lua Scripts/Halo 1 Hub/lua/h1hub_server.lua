@@ -1,10 +1,13 @@
 --Talking Timer Server Side Script by Michelle
+--It's terrible!
 api_version = "1.9.0.0"
 
 
 -- Enable Training Mode in a match using:  lua_call h1hub_server enable_training_mode
 -- Disable Training Mode in a match using: lua_call h1hub_server disable_training_mode
 
+-- Enable Weapon Callouts using:  lua_call h1hub_server enable_weapon_callouts
+-- Disable Weapon Callouts using: lua_call h1hub_server disable_weapon_callouts
 
 -- Admin setup:
 enable_timer_functions = true
@@ -47,6 +50,14 @@ end
 
 function disable_training_mode()
 	training_mode = false
+end
+
+function enable_weapon_callouts()
+	enable_weapon_announcement = true
+end
+
+function disable_weapon_callouts()
+	enable_weapon_announcement = false
 end
 
 --
