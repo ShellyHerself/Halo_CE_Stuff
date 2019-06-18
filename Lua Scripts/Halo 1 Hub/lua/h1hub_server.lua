@@ -62,7 +62,33 @@ function disable_weapon_callouts()
 	CleanUpNavpoints()
 end
 
---
+--- Setup to convert the SAPP functionality to Chimera-like functionality
+
+read_u8 = read_byte
+write_u8 = write_byte
+
+read_i8 = read_char
+write_i8 = write_char
+
+read_u16 = read_word
+write_u16 = write_word
+
+read_i16 = read_short
+write_i16 = write_short
+
+read_u32 = read_dword
+write_u32 = write_dword
+
+read_i32 = read_int
+write_i32 = write_int
+
+read_f32 = read_float
+write_f32 = write_float
+
+read_vec3d = read_vector3d
+write_vec3d = write_vector3d
+
+---
 function OnScriptLoad()
 	register_callback(cb['EVENT_GAME_START'],"OnGameStart")
 	register_callback(cb['EVENT_GAME_END'],"OnGameEnd")
@@ -153,13 +179,13 @@ function SpawnBeepSendToTeamMates(player_id, spawning_now)
 	local player = get_player(player_id)
 	if player ~= 0 then
 		if team_mate_spawn_beeps then
-			local team = read_byte(player+0x20)
+			local team = read_u8(player+0x20)
 			
 			for i=1,16 do
 				if i ~= player_id then
 					player_i = get_player(i)
 					if player_i ~= 0 then
-						local team_i = read_byte(player_i+0x20)
+						local team_i = read_u8(player_i+0x20)
 						if team == team_i then
 							if spawning_now then
 								rprint(i, "|n" ..sep.. "spawn_beep" ..sep .. "spawned")
@@ -185,20 +211,20 @@ function InitializeTimers()
 		cprint("Failed to find tick_counter_sig.")
 		return
 	end
-	tick_counter = read_dword(read_dword(tick_counter_sig + 2)) + 0xC
+	tick_counter = read_u32(read_u32(tick_counter_sig + 2)) + 0xC
 	
 	local sv_map_reset_tick_sig = sig_scan("8B510C6A018915????????E8????????83C404")
 	if(sv_map_reset_tick_sig == 0) then
 		cprint("Failed to find sv_map_reset_tick_sig.")
 		return
 	end
-	sv_map_reset_tick = read_dword(sv_map_reset_tick_sig + 7)
+	sv_map_reset_tick = read_u32(sv_map_reset_tick_sig + 7)
 end
 
 sound_blocked_secs = 0
 
 function TimersOnTick()
-	ticks_passed = read_dword(tick_counter) - read_dword(sv_map_reset_tick)
+	ticks_passed = read_u32(tick_counter) - read_u32(sv_map_reset_tick)
 
 	if (ticks_passed % 30) == 0 then
 		if (count_down_seconds > 0) then
@@ -345,22 +371,22 @@ function CutsceneTitleDelete(player_id, slot)
 end
 
 function GetScenarioData()
-	local scenario_ptr = read_dword(0x40440028+0x14)
+	local scenario_ptr = read_u32(0x40440028+0x14)
 	local cutscene_flags_reflexive_offset = 1252
-	local cutscene_flag_count = read_dword(scenario_ptr+cutscene_flags_reflexive_offset)
-	local cutscene_flag_ptr = read_dword(scenario_ptr+cutscene_flags_reflexive_offset+4)
+	local cutscene_flag_count = read_u32(scenario_ptr+cutscene_flags_reflexive_offset)
+	local cutscene_flag_ptr = read_u32(scenario_ptr+cutscene_flags_reflexive_offset+4)
 	
 	cutscene_flags = {}
 	for i=0,cutscene_flag_count-1 do
 		local this_name = read_string(cutscene_flag_ptr+i*92+4)
-		local pos_x, pos_y, pos_z  = read_vector3d(cutscene_flag_ptr+i*92+36)
+		local pos_x, pos_y, pos_z  = read_vec3d(cutscene_flag_ptr+i*92+36)
 		local this_entry = {name=this_entry, x=pos_x, y=pos_y, z=pos_z}
 		table.insert(cutscene_flags, this_entry)
 	end
 	
 	local netgame_equipment_reflexive_offset = 900
-	local equipment_count = read_dword(scenario_ptr+netgame_equipment_reflexive_offset)
-	local equipment_ptr = read_dword(scenario_ptr+netgame_equipment_reflexive_offset+4)
+	local equipment_count = read_u32(scenario_ptr+netgame_equipment_reflexive_offset)
+	local equipment_ptr = read_u32(scenario_ptr+netgame_equipment_reflexive_offset+4)
 	
 	local ctf_enabled    = {1}
 	local slayer_enabled = {2, 12, 13, 14}
@@ -374,38 +400,38 @@ function GetScenarioData()
 		local slayer = false
 		local ball   = false
 		local king   = false
-		local spawn_time = read_word(equipment_ptr+i*144+14)
-		local pos_x, pos_y, pos_z = read_vector3d(equipment_ptr+i*144+64)
+		local spawn_time = read_u16(equipment_ptr+i*144+14)
+		local pos_x, pos_y, pos_z = read_vec3d(equipment_ptr+i*144+64)
 		local equip_type = 0
 		for j=0,3 do
 			for k, v in pairs(ctf_enabled) do
-				if ctf_enabled[k] == read_word(equipment_ptr+i*144+j*2+4) then
+				if ctf_enabled[k] == read_u16(equipment_ptr+i*144+j*2+4) then
 					ctf = true
 					break
 				end
 			end
 			for k, v in pairs(slayer_enabled) do
-				if slayer_enabled[k] == read_word(equipment_ptr+i*144+j*2+4) then
+				if slayer_enabled[k] == read_u16(equipment_ptr+i*144+j*2+4) then
 					slayer = true
 					break
 				end
 			end
 			for k, v in pairs(ball_enabled) do
-				if ball_enabled[k] == read_word(equipment_ptr+i*144+j*2+4) then
+				if ball_enabled[k] == read_u16(equipment_ptr+i*144+j*2+4) then
 					ball = true
 					break
 				end
 			end
 			for k, v in pairs(king_enabled) do
-				if king_enabled[k] == read_word(equipment_ptr+i*144+j*2+4) then
+				if king_enabled[k] == read_u16(equipment_ptr+i*144+j*2+4) then
 					king = true
 					break
 				end
 			end
 		end
-		local tag_path = read_string(read_dword(equipment_ptr+i*144+80+4))
+		local tag_path = read_string(read_u32(equipment_ptr+i*144+80+4))
 		if spawn_time == 0 then
-			spawn_time = read_word(read_dword(lookup_tag(read_dword(equipment_ptr+i*144+80+12))+0x14)+12)
+			spawn_time = read_u16(read_u32(lookup_tag(read_u32(equipment_ptr+i*144+80+12))+0x14)+12)
 			if spawn_time == 0 then
 				spawn_time = 30
 			end
