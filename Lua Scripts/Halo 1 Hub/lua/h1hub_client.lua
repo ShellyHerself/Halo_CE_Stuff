@@ -114,11 +114,11 @@ function OnRconMessage(message)
 		end
 		return false
 		
-	elseif CompareEndOfString(message, "|ndelete") == true then
+	elseif CompareEndOfString(message, "|ndelete") then
 		-- return false to delete
 		return false
 		
-	elseif CompareEndOfString(message, "|nhud_text") == true then
+	elseif CompareEndOfString(message, "|nhud_text") then
 		-- remove all special and positional data before sending it over to the hud
 		message = string.gsub(message, "|nhud_text", "")
 		message = string.gsub(message, "|r", "")
@@ -230,9 +230,9 @@ end
 
 function CutsceneTitleRemove(slot)
 	write_argb(cutscene_title_block_addr+96*slot+60, 0, 0, 0, 0)
-	write_f32(cutscene_title_block_addr+96*slot+68, 0)
-	write_f32(cutscene_title_block_addr+96*slot+72, 0)
-	write_f32(cutscene_title_block_addr+96*slot+76, 0)
+	write_f32( cutscene_title_block_addr+96*slot+68, 0)
+	write_f32( cutscene_title_block_addr+96*slot+72, 0)
+	write_f32( cutscene_title_block_addr+96*slot+76, 0)
 end
 -- Decodes a string into a set of number variables the given list of what size each var takes up in the string.
 function DecodeMessageUsingStruct(message, size_list)
