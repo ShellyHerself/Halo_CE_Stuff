@@ -283,26 +283,30 @@ end
 
 function OnScreenTimerUpdate(minutes, seconds)
 	for i=1,16 do
-		ClearPlayerConsole(i)
 		if tens_flash_in_a_different_color then
 			--rprint(i, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds) .. "|ncin_tit")
 			if seconds == 0 then
-			CutsceneTitlePrint(i, 2+seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0, 0.25, 0.5, 200, 255, 0, 0)
-			CutsceneTitlePrint(i, seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0.75, 1, 1, 160, 117, 186, 255)
+				CutsceneTitlePrint(i, 2+seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0.00, 0.25, 0.50, 200, 255,   0,   0)
+				ClearPlayerConsole(i)
+				CutsceneTitlePrint(i,   seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0.75, 1.00, 1.00, 160, 117, 186, 255)
 			
 			elseif seconds == 30 then
-			CutsceneTitlePrint(i, 2+seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0, 0.25, 0.5, 200, 0, 255, 0)
-			CutsceneTitlePrint(i, seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0.75, 1, 1, 160, 117, 186, 255)
+				CutsceneTitlePrint(i, 2+seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0.00, 0.25, 0.50, 200,   0, 255,   0)
+				ClearPlayerConsole(i)
+				CutsceneTitlePrint(i,   seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0.75, 1.00, 1.00, 160, 117, 186, 255)
 			
 			elseif seconds % 10 == 0 then
-			CutsceneTitlePrint(i, 2+seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0, 0.25, 0.5, 200, 255, 255, 255)
-			CutsceneTitlePrint(i, seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0.75, 1, 1, 160, 117, 186, 255)
+				CutsceneTitlePrint(i, 2+seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0.00, 0.25, 0.50, 200, 255, 255, 255)
+				ClearPlayerConsole(i)
+				CutsceneTitlePrint(i,   seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0.75, 1.00, 1.00, 160, 117, 186, 255)
 			
 			else
-			CutsceneTitlePrint(i, seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0, 1, 1, 160, 117, 186, 255)
+				ClearPlayerConsole(i)
+				CutsceneTitlePrint(i,   seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0.00, 1.00, 1.00, 160, 117, 186, 255)
 			end
 		else
-			CutsceneTitlePrint(i, seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0, 1, 1, 160, 117, 186, 255)
+			ClearPlayerConsole(i)
+			CutsceneTitlePrint(i,       seconds % 2, "|r" .. string.format("%02d", minutes) .. ":" .. string.format("%02d", seconds), -1, -40, 0.00, 1.00, 1.00, 160, 117, 186, 255)
 		end
 		CutsceneTitleDelete(i, (seconds+1) % 2)
 	end
