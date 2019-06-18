@@ -110,12 +110,12 @@ function OnTick()
 		end
 	end
 	
-	if training_mode == true and last_tick_training_mode == false then
+	if training_mode and not last_tick_training_mode then
 		for player_id=1,16 do
 			rprint(player_id, "|n" ..sep.. "training_mode" ..sep .. "true")
 		end
 		last_tick_training_mode = true
-	elseif training_mode == false and last_tick_training_mode == true then
+	elseif not training_mode and last_tick_training_mode then
 		for player_id=1,16 do
 			rprint(player_id, "|n" ..sep.. "training_mode" ..sep .. "false")
 		end
@@ -211,17 +211,17 @@ function TimersOnTick()
 		local minutes = math.floor(time_passed / 60) % 30 --modulus 30 so it resets after 30 minutes
 		local seconds = time_passed % 60
 		
-		if enable_weapon_announcements == true then
+		if enable_weapon_announcements then
 			WeaponAnnounce(time_passed)
 			NextNavpointQueueItem()
 		end
-		if enable_talking_timer == true then
+		if enable_talking_timer then
 			if sound_blocked_secs < 1 then
 				TalkingTimerAnnounce(time_passed, minutes, seconds)
 			end
 		end
 		
-		if enable_cutscene_title_timer == true then
+		if enable_cutscene_title_timer then
 			OnScreenTimerUpdate(minutes, seconds)
 		end
 	end
@@ -515,27 +515,27 @@ function WeaponAnnounce(time_passed)
 			if time_till_resp == 10 then
 				if time_passed % 60 == 50 then
 					if ne[k].equipment_type == ROCKET_LAUNCHER then
-						if enable_rocket_announcement == true then
+						if enable_rocket_announcement then
 							rockets = rockets + 1
 						end
 					end
 					if ne[k].equipment_type == SNIPER_RIFLE then
-						if enable_sniper_announcement == true then
+						if enable_sniper_announcement then
 							sniper = sniper + 1
 						end
 					end
 					if ne[k].equipment_type == OVERSHIELD then
-						if enable_os_announcement == true then
+						if enable_os_announcement then
 							ovie = ovie + 1
 						end
 					end
 					if ne[k].equipment_type == SHIELD_CAMO then
-						if enable_os_announcement == true then
+						if enable_os_announcement then
 							combo = combo + 1
 						end
 					end
 					if ne[k].equipment_type == CAMO then
-						if enable_camo_announcement == true then
+						if enable_camo_announcement then
 							camo = camo + 1
 						end
 					end
@@ -544,7 +544,7 @@ function WeaponAnnounce(time_passed)
 			if time_till_resp == 5 then
 				if time_passed % 60 ~= 55 then
 					if ne[k].equipment_type == ROCKET_LAUNCHER then
-						if enable_rocket_announcement == true then
+						if enable_rocket_announcement then
 							if (resp_time % 0 ~= 0) then
 								rockets = rockets + 1
 							end
@@ -552,7 +552,7 @@ function WeaponAnnounce(time_passed)
 						end
 					end
 					if ne[k].equipment_type == SNIPER_RIFLE then
-						if enable_sniper_announcement == true then
+						if enable_sniper_announcement then
 							if (resp_time % 0 ~= 0) then
 								sniper = sniper + 1
 							end
@@ -560,7 +560,7 @@ function WeaponAnnounce(time_passed)
 						end
 					end
 					if ne[k].equipment_type == OVERSHIELD then
-						if enable_os_announcement == true then
+						if enable_os_announcement then
 							if (resp_time % 0 ~= 0) then
 								ovie = ovie + 1
 							end
@@ -568,7 +568,7 @@ function WeaponAnnounce(time_passed)
 						end
 					end
 					if ne[k].equipment_type == CAMO then
-						if enable_camo_announcement == true then
+						if enable_camo_announcement then
 							if (resp_time % 0 ~= 0) then
 								camo = camo + 1
 							end
@@ -576,7 +576,7 @@ function WeaponAnnounce(time_passed)
 						end
 					end
 					if ne[k].equipment_type == SHIELD_CAMO then
-						if enable_camo_announcement == true then
+						if enable_camo_announcement then
 							if (resp_time % 0 ~= 0) then
 								combo = combo + 1
 							end
