@@ -50,14 +50,16 @@ end
 
 function disable_training_mode()
 	training_mode = false
+	CleanUpNavpoints()
 end
 
 function enable_weapon_callouts()
-	enable_weapon_announcement = true
+	enable_weapon_announcements = true
 end
 
 function disable_weapon_callouts()
-	enable_weapon_announcement = false
+	enable_weapon_announcements = false
+	CleanUpNavpoints()
 end
 
 --
@@ -459,38 +461,42 @@ hell_ovie = 0
 hell_camo = 0
 hell_combo = 0
 
-function WeaponAnnounce(time_passed)
-	if time_passed % 60 ~= 55 and time_passed % 5 == 0 then
-		for i=1,16 do
-			for j=1,hell_rockets do
-				if j == 1 then
-					rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."rocket_flag"..sep..(i-1))
-				else
-					rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."rocket_flag"..j..sep..(i-1))
-				end
-			end
-			for j=1,hell_sniper do
-				if j == 1 then
-					rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."sniper_flag"..sep..(i-1))
-				else
-					rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."sniper_flag"..j..sep..(i-1))
-				end
-			end
-			for j=1,hell_camo do
-				if j == 1 then
-					rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."camo_flag"..sep..(i-1))
-				else
-					rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."camo_flag"..j..sep..(i-1))
-				end
-			end
-			for j=1,hell_ovie+hell_combo do
-				if j == 1 then
-					rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."overshield_flag"..sep..(i-1))
-				else
-					rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."overshield_flag"..j..sep..(i-1))
-				end
+function CleanUpNavpoints()
+	for i=1,16 do
+		for j=1,hell_rockets do
+			if j == 1 then
+				rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."rocket_flag"..sep..(i-1))
+			else
+				rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."rocket_flag"..j..sep..(i-1))
 			end
 		end
+		for j=1,hell_sniper do
+			if j == 1 then
+				rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."sniper_flag"..sep..(i-1))
+			else
+				rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."sniper_flag"..j..sep..(i-1))
+			end
+		end
+		for j=1,hell_camo do
+			if j == 1 then
+				rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."camo_flag"..sep..(i-1))
+			else
+				rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."camo_flag"..j..sep..(i-1))
+			end
+		end
+		for j=1,hell_ovie+hell_combo do
+			if j == 1 then
+				rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."overshield_flag"..sep..(i-1))
+			else
+				rprint(i, "|n"..sep.."nav"..sep.."del"..sep.."overshield_flag"..j..sep..(i-1))
+			end
+		end
+	end
+end
+
+function WeaponAnnounce(time_passed)
+	if time_passed % 60 ~= 55 and time_passed % 5 == 0 then
+		CleanUpNavpoints()
 	end
 
 	local message_to_send = "|n"..sep.."timer"
