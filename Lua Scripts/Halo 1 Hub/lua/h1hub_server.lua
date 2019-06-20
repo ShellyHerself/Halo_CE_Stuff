@@ -131,25 +131,25 @@ end
 last_tick_training_mode = false
 function OnTick()
 	if game_in_progress == true then
+		if training_mode and not last_tick_training_mode then
+			for player_id=1,16 do
+				rprint(player_id, "|n" ..sep.. "training_mode" ..sep .. "true")
+			end
+			last_tick_training_mode = training_mode
+		elseif not training_mode and last_tick_training_mode then
+			for player_id=1,16 do
+				rprint(player_id, "|n" ..sep.. "training_mode" ..sep .. "false")
+			end
+			last_tick_training_mode = training_mode
+		end
+	
+		for player_id=1,16 do
+			SpawnBeepSendToTeamMates(player_id, false)
+		end
+	
 		if enable_timer_functions == true then
 			TimersOnTick()
 		end
-	end
-	
-	if training_mode and not last_tick_training_mode then
-		for player_id=1,16 do
-			rprint(player_id, "|n" ..sep.. "training_mode" ..sep .. "true")
-		end
-		last_tick_training_mode = true
-	elseif not training_mode and last_tick_training_mode then
-		for player_id=1,16 do
-			rprint(player_id, "|n" ..sep.. "training_mode" ..sep .. "false")
-		end
-		last_tick_training_mode = false
-	end
-	
-	for player_id=1,16 do
-		SpawnBeepSendToTeamMates(player_id, false)
 	end
 end
 
