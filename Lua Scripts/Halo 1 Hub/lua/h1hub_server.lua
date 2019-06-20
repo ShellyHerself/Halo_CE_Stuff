@@ -177,21 +177,23 @@ end
 
 function SpawnBeepSendToTeamMates(player_id, spawning_now)
 	local player = get_player(player_id)
-	if player ~= 0 then
-		if team_mate_spawn_beeps then
-			local team = read_u8(player+0x20)
-			
-			for i=1,16 do
-				if i ~= player_id then
-					player_i = get_player(i)
-					if player_i ~= 0 then
-						local team_i = read_u8(player_i+0x20)
-						if team == team_i then
-							if spawning_now then
-								rprint(i, "|n" ..sep.. "spawn_beep" ..sep .. "spawned")
-							else
-								rprint(i, "|n" ..sep.. "spawn_beep" ..sep .. "nope")
-							end
+	if player ~= 0 and team_mate_spawn_beeps then
+		local team = read_u8(player+0x20)
+		local respawn_ticks = read_dword(player+0x2C)
+
+		if respawn_ticks > 90 and respawn_ticks < 30 and respawn_ticks % 30 ~= 0 and spawning_now == false then
+			return
+		end
+		for i=1,16 do
+			if i ~= player_id then
+				player_i = get_player(i)
+				if player_i ~= 0 then
+					local team_i = read_u8(player_i+0x20)
+					if team == team_i then
+						if spawning_now then
+							rprint(i, "|n" ..sep.. "spawn_beep" ..sep .. "spawned")
+						else
+							rprint(i, "|n" ..sep.. "spawn_beep" ..sep .. "nope")
 						end
 					end
 				end
